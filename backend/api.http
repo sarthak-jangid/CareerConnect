@@ -1,0 +1,84 @@
+POST http://localhost:9090/register HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "Rahul",
+  "email": "rahul@example.com",
+  "password": "a",
+  "username": "rahul"
+}
+
+// Jhon Doe login
+###
+POST http://localhost:9090/login HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "john@example.com",
+  "password": "password123"
+}
+
+// Rahul login
+
+###
+POST http://localhost:9090/login HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "rahul@example.com",
+  "password": "a"
+}
+
+// Jhon Doe profile
+###
+GET http://localhost:9090/get_user_and_profile HTTP/1.1
+Content-Type: application/json
+
+{
+  "token": "efd851f028c9deee38f8d73fb4733574fb01ea0fe122a103771797075b7f58a4f2d9a36010a3fdd2d681715dcd4b7dd431e85f50686343ec56afc3bc88f21d9c"
+}
+
+// Rahul profile
+###
+GET http://localhost:9090/get_user_and_profile HTTP/1.1
+Content-Type: application/json
+
+{
+  "token": "ea8761ffa5e8dcc02e15b99a1ebaca6b2d8b98cbd01ce3885db0e0bb7c8317f3dbe509bd183723a671e81ab44c5b76774fd2834661bd7f6cfe7f0dd4e35133bd"
+}
+
+
+###
+POST http://localhost:9090/update_profile_data HTTP/1.1
+Content-Type: application/json
+
+{
+  "token": "efd851f028c9deee38f8d73fb4733574fb01ea0fe122a103771797075b7f58a4f2d9a36010a3fdd2d681715dcd4b7dd431e85f50686343ec56afc3bc88f21d9c",
+  "bio": "Hello, I'm John Doe.",
+  "currentPost" : "Software Engineer",
+  "pastWork" : [
+    {
+      "company": "ABC Corp",
+      "position": "Junior Developer",
+      "year": "2019-2021"
+    },
+    {
+      "company": "XYZ Inc",
+      "position": "Intern",
+      "year": "2018-2019"
+    }
+  ],
+  "education" : [
+    {
+      "school": "Kuchanman college",
+      "degree": "BCA",
+      "fieldOfStudy": "2023-2026"
+    }
+  ]
+}
+
+
+// Get all user profiles
+###
+GET http://localhost:9090/user/get_all_users HTTP/1.1
+Content-Type: application/json

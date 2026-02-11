@@ -1,0 +1,27 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+/* global CSS - place in your global stylesheet */
+/* Base toast */
+/* Base toast */
+.cc-toast {
+  border-radius: 10px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px; /* space for optional icon */
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  min-width: 300px;
+  max-width: 400px;
+  word-break: break-word;
+  overflow: hidden;
+}
+

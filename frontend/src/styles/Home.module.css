@@ -1,0 +1,146 @@
+/* ------------------------ */
+/* Container base styles    */
+/* ------------------------ */
+.container {
+  padding: 1.2rem;
+  font-family: "Poppins", sans-serif;
+}
+
+/* Main container (left + right) */
+.mainContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4rem;
+  padding-inline: 2rem;
+  height: 80vh; /* desktop height */
+  min-height: 500px; /* ensure minimum height */
+}
+
+/* Left and right sections */
+.mainContainer_left {
+  flex: 0.5;
+}
+
+.mainContainer_right {
+  flex: 0.5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Left section text */
+.mainContainer_left > p:nth-child(1) {
+  font-weight: bold;
+  font-size: 2.2rem;
+}
+
+.mainContainer_left > p:nth-child(2) {
+  margin-top: 0.6rem;
+  color: gray;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+/* Left section button */
+.mainContainer_left > button {
+  width: fit-content;
+  cursor: pointer;
+  padding-inline: 1.2rem;
+  padding-block: 0.6rem;
+  border-radius: 20px;
+  color: white;
+  background: rgb(221, 70, 70);
+  border: none;
+  margin: 0.8rem 0;
+  font-size: 0.9rem;
+  font-weight: bold;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.mainContainer_left > button:hover {
+  background: rgb(200, 50, 50);
+  transform: translateY(-2px);
+}
+
+/* Right section content */
+.mainContainer_right img,
+.mainContainer_right svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ------------------------ */
+/* Responsive adjustments   */
+/* ------------------------ */
+
+/* Large tablets / small desktops */
+@media (max-width: 1024px) {
+  .mainContainer {
+    gap: 2rem;
+    padding-inline: 1.5rem;
+  }
+
+  .mainContainer_left > p:nth-child(1) {
+    font-size: 2rem;
+  }
+
+  .mainContainer_left > p:nth-child(2) {
+    font-size: 0.95rem;
+  }
+}
+
+/* Tablets / stacked layout */
+@media (max-width: 768px) {
+  .mainContainer {
+    flex-direction: column; /* stack left + right */
+    height: 100vh;          /* full viewport height */
+    gap: 2rem;
+    padding-inline: 1rem;
+    justify-content: center; /* vertical center */
+    align-items: center;     /* horizontal center */
+  }
+
+  .mainContainer_left,
+  .mainContainer_right {
+    flex: none;
+    width: 100%;
+    text-align: center;
+  }
+
+  .mainContainer_left > p:nth-child(1) {
+    font-size: 1.8rem;
+  }
+
+  .mainContainer_left > p:nth-child(2) {
+    font-size: 0.95rem;
+  }
+
+  .mainContainer_left > button {
+    font-size: 0.85rem;
+    padding-inline: 1rem;
+    padding-block: 0.5rem;
+  }
+}
+
+/* Mobile phones */
+@media (max-width: 480px) {
+  .mainContainer {
+    padding-inline: 0.8rem;
+    gap: 1.5rem;
+  }
+
+  .mainContainer_left > p:nth-child(1) {
+    font-size: 1.5rem;
+  }
+
+  .mainContainer_left > p:nth-child(2) {
+    font-size: 0.9rem;
+  }
+
+  .mainContainer_left > button {
+    font-size: 0.8rem;
+    padding-inline: 0.9rem;
+    padding-block: 0.5rem;
+  }
+}

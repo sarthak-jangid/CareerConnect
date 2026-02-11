@@ -1,0 +1,49 @@
+.homeContainer {
+  display: flex;
+}
+
+.homeContainer > div:nth-child(odd) {
+  flex: 0.2;
+}
+
+.homeContainer > div:nth-child(even) {
+  flex: 0.6;
+}
+
+.homeContainer_leftBar {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: start;
+  margin-top: 1.3rem;
+}
+
+.sideBarOption {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  font-size: 1rem;
+  width: 80%;
+  margin: 0 auto;
+  padding: 0.45rem 0.6rem;
+
+  cursor: pointer;
+  border-radius: 6px;
+
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+}
+
+.sideBarOption:hover {
+  background-color: rgba(0, 0, 0, 0.06); /* hover feel */
+  transform: translateX(3px); /* subtle motion */
+}
+
+.sideBarOption > svg {
+  height: 1.4em;
+  flex-shrink: 0;
+}
+
+.homeContainer_extraContainer {
+  margin-top: 1.3rem;
+}
