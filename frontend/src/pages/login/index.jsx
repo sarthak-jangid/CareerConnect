@@ -41,38 +41,6 @@ function Login() {
     }
   }, [mode]);
 
-  // Redirect on login success (only if this component initiated the login)
-  useEffect(() => {
-    if (auth.isLoggedIn && lastActionRef.current === "login") {
-      toast.success(
-        (auth.message && (auth.message.message || auth.message)) ||
-          "Login successful"
-      );
-      lastActionRef.current = null;
-      setSubmitting(false);
-      // router.push("/dashboard");
-    }
-  }, [auth.isLoggedIn, auth.message, router]);
-
-  // Show registration success (only if this component initiated the register) .......................................................
-  //
-
-  // useEffect(() => {
-  //   if (auth.status === "succeeded" && lastActionRef.current === "register") {
-  //     if (!auth.isLoggedIn) {
-  //       toast.success(
-  //         (auth.message && (auth.message.message || auth.message)) ||
-  //           "Account created"
-  //       );
-  //     }
-
-  //     lastActionRef.current = null;
-  //     setSubmitting(false);
-  //   }
-  // }, [auth.status, auth.message]);
-  //
-  // ...................................................................................................................
-
   // Show server-side/auth errors as toast (only for the last action started here)
   useEffect(() => {
     if (auth.isError && lastActionRef.current) {
@@ -114,12 +82,12 @@ function Login() {
 
     try {
       if (mode === "login") {
-        // dispatch and rely on auth slice flags / effects for toasts and redirect
         await dispatch(
           loginUser({ email: form.email, password: form.password })
         ).unwrap();
-
-        router.replace("/dashboard");
+        toast.success("Login successful");
+        setSubmitting(false);
+        router.push("/dashboard");
       } else {
         await dispatch(
           registerUser({
@@ -129,17 +97,16 @@ function Login() {
             password: form.password,
           })
         ).unwrap();
+        toast.success("Account created");
 
-        // login immediately after registration
         lastActionRef.current = "login";
-
-        // login
         await dispatch(
           loginUser({ email: form.email, password: form.password })
         ).unwrap();
-        router.replace("/dashboard");
+        toast.success("Login successful");
+        setSubmitting(false);
+        router.push("/dashboard");
       }
-      // Do not show toasts here — handled by the effects above using auth slice state
     } catch (err) {
       setSubmitting(false);
       lastActionRef.current = null;

@@ -71,10 +71,10 @@ export const getPostLike = createAsyncThunk(
   "post/getPostLike",
   async (postId, thunkAPI) => {
     try {
-      const response = await clientServer.get(`/likePost/${postId}`);
+      const response = await clientServer.get(`/getPostLike/${postId}`);
       return thunkAPI.fulfillWithValue(response.data);
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
+      return thunkAPI.rejectWithValue(error.response?.data || error.message);
     }
   },
 );
@@ -83,7 +83,7 @@ export const getAllCommentsForPost = createAsyncThunk(
   "post/getCommentsForPost",
   async (postId, thunkAPI) => {
     try {
-      console.log("post action check .")
+      console.log("post action check .");
       const response = await clientServer.get("/getCommentsForPost", {
         params: { postId },
       });
@@ -92,8 +92,24 @@ export const getAllCommentsForPost = createAsyncThunk(
         postId: postId,
       });
     } catch (error) {
-      console.log("post action error check .")
-      console.log(error)
+      console.log("post action error check .");
+      console.log(error);
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  },
+);
+
+export const commentOnPost = createAsyncThunk(
+  "post/commentOnPost",
+  async (commentData, thunkAPI) => {
+    try {
+      console.log(commentData)
+      const response = await clientServer.post("/commentOnPost", {
+        postId: commentData.postId,
+        comment: commentData.comment,
+      });
+      return thunkAPI.fulfillWithValue(response.data);
+    } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
     }
   },

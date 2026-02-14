@@ -14,12 +14,15 @@ import DashboardLayout from "@/layout/DashboardLayout";
 import { getAllUsers } from "@/redux/actions/authActions";
 import { BASE_URL } from "@/config/api";
 import styles from "./index.module.css";
+import { reset, resetPostId } from "@/redux/reducers/postReducers";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
+
   const [postContent, setPostContent] = useState("");
   const [fileContent, setFileContent] = useState("");
-  const [commentContent, setCommentContent] = useState("");
+  const [commentText, setCommentText] = useState("");
+
   const authState = useSelector((state) => state.auth);
   const postState = useSelector((state) => state.post);
 
@@ -111,8 +114,8 @@ const Dashboard = () => {
           )}
 
           <div className={styles.postContainer}>
-            {postState.posts.map((post) => (
-              <div key={post._id} className={styles.singleCard}>
+            {(postState?.posts || []).map((post) => (
+              <div key={post._id.toString()} className={styles.singleCard}>
                 {/* Header */}
                 <div className={styles.cardHeader}>
                   {/* Left */}
@@ -222,6 +225,7 @@ const Dashboard = () => {
                       />
                     </svg>
                   </div>
+
                   <div className={styles.share}>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -243,6 +247,123 @@ const Dashboard = () => {
             ))}
           </div>
         </div>
+
+        {/* // commect section window ... */}
+        {/* Comment section modal */}
+        {postState.postId != "" && (
+          <div
+            onClick={() => {
+              dispatch(resetPostId());
+              setCommentText("");
+            }}
+            className={styles.commentContainer}
+          >
+            <div
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+              className={styles.allComments}
+            >
+              {/* Header */}
+              <div className={styles.commentHeader}>
+                <h3>Comments</h3>
+                <button
+                  className={styles.closeBtn}
+                  onClick={() => {
+                    dispatch(resetPostId());
+                    setCommentText("");
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Comments list */}
+              <div className={styles.commentsList}>
+                {postState.comments.length === 0 ? (
+                  <div className={styles.noComments}>
+                    <p>No comments yet. Be the first to comment!</p>
+                  </div>
+                ) : (
+                  postState.comments.map((postComment) => (
+                    <div key={postComment._id.toString()} className={styles.singleComment}>
+                      <img
+                        src={
+                          postComment.userId.profilePicture
+                            ? `${BASE_URL}/${postComment.userId.profilePicture}`
+                            : "/default.jpg"
+                        }
+                        alt={postComment.userId.name}
+                        className={styles.commentProfileImg}
+                      />
+                      <div className={styles.commentContent}>
+                        <div className={styles.commentHeader_info}>
+                          <p className={styles.commentName}>
+                            {postComment.userId.name}
+                          </p>
+                          <span className={styles.commentHandle}>
+                            @{postComment.userId.username}
+                          </span>
+                        </div>
+                        <p className={styles.commentBody}>{postComment.body}</p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* Comment input */}
+              <div className={styles.commentInput_section}>
+                <img
+                  src={
+                    authState.user?.userId?.profilePicture
+                      ? `${BASE_URL}/${authState.user.userId.profilePicture}`
+                      : "/default.jpg"
+                  }
+                  alt="your profile"
+                  className={styles.commentProfileImg}
+                />
+                <div className={styles.inputGroup}>
+                  <input
+                    type="text"
+                    value={commentText}
+                    onChange={(e) => setCommentText(e.target.value)}
+                    placeholder="Write a comment..."
+                    className={styles.commentInput}
+                    onKeyPress={(e) => {
+                      if (e.key === "Enter" && commentText.trim()) {
+                        dispatch(
+                          commentOnPost({
+                            postId: postState.postId,
+                            comment: commentText,
+                          }),
+                        );
+                        dispatch(getAllCommentsForPost(postState.postId));
+                        setCommentText("");
+                      }
+                    }}
+                  />
+                  <button
+                    disabled={!commentText.trim()}
+                    onClick={async () => {
+                      await dispatch(
+                        commentOnPost({
+                          postId: postState.postId,
+                          comment: commentText,
+                        }),
+                      );
+                      await dispatch(getAllCommentsForPost(postState.postId));
+                      setCommentText("");
+                    }}
+                    className={styles.commentButton}
+                  >
+                    Post
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </DashboardLayout>
     </UserLayout>
   );
