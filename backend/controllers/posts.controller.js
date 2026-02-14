@@ -159,9 +159,10 @@ export const get_comments_for_post = async (req, res) => {
     console.log(req.query);
     const comments = await Comment.find({ postId: postId }).populate(
       "userId",
-      "name profilePicture",
+      "username name profilePicture",
     );
-    return res.status(200).json(comments);
+    console.log(comments);
+    return res.status(200).json(comments.reverse());
   } catch (error) {
     console.log("backend error ...");
     return res.status(500).json({ message: error.message });
