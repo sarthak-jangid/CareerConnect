@@ -1,7 +1,6 @@
 import React from "react";
 import styles from "./styles.module.css";
 import { useRouter } from "next/router";
-import { reset } from "@/redux/reducers/authReducers";
 import { useSelector, useDispatch } from "react-redux";
 
 export default function NavBar() {

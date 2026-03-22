@@ -138,14 +138,67 @@
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
+  margin-top: 1rem;
 }
 
 .workCard {
+  width: 260px;
   padding: 1rem;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.08);
+  border-radius: 14px;
+  background: linear-gradient(180deg, #ffffff, #fafafa);
+  border: 1px solid #eee;
+  transition: all 0.25s ease;
+  position: relative;
 }
+
+.workCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.08);
+}
+
+/* TOP ROW */
+.workTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* POSITION */
+.workTop h5 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+/* YEAR BADGE */
+.workTop span {
+  font-size: 0.7rem;
+  background: #eef2ff;
+  color: #4f46e5;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+/* COMPANY */
+.company {
+  margin-top: 6px;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+/* LEFT BORDER ACCENT (LinkedIn feel) */
+.workCard::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 4px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #2563eb, #1d4ed8);
+}
+
 
 /* MOBILE */
 @media (max-width: 768px) {
@@ -158,8 +211,9 @@
     width: 100%;
   }
 
-  .profileImageWrapper {
+   .profileImageWrapper {
     left: 50%;
     transform: translateX(-50%);
+    bottom: -50px;
   }
 }

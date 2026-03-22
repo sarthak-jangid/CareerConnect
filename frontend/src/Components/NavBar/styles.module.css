@@ -39,13 +39,13 @@
 
 /* Greeting text */
 .greeting {
-  font-size: 14px;
-  color: #444;
+  font-size: 0.85rem;
+  color: #6b7280;
 }
 
 .greeting span {
   font-weight: 600;
-  color: #000;
+  color: #111827;
 }
 
 /* Profile button */
@@ -80,3 +80,4 @@
 .joinBtn:hover {
   background: #2c6cbf;
 }
+

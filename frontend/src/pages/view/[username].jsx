@@ -18,6 +18,7 @@ export default function ViewProfilePage({ userProfile }) {
 
   const postReducer = useSelector((state) => state.postReducer);
   const authState = useSelector((state) => state.auth);
+  const postState = useSelector((state) => state.post);
 
   const [userPosts, setUserPosts] = useState([]);
   const [isCurrentUserInConnection, setIsCurrentUserInConnection] =
@@ -37,18 +38,14 @@ export default function ViewProfilePage({ userProfile }) {
     await dispatch(getAllPosts());
   };
 
-  useEffect(() => {
-    if (!userProfile?.userId?._id) return;
-
-    const allPosts = postReducer?.posts || [];
-
-    const filtered = allPosts.filter(
-      (post) => post?.userId?._id === userProfile.userId._id
-    );
-
-    setUserPosts(filtered);
-  }, [postReducer, userProfile]);
-
+ useEffect(() => {
+    if (authState.user && postState.postFetched) {
+      const posts = (postState.posts || []).filter(
+        (post) => post?.userId?.username === userProfile.userId.username,
+      );
+      setUserPosts(posts);
+    }
+  }, [authState.user, postState]);
   useEffect(() => {
     if (!userProfile?.userId?._id) return;
 
@@ -132,7 +129,7 @@ export default function ViewProfilePage({ userProfile }) {
                   </div>
                 )}
 
-                {/* ✅ BIO WITH LIMIT */}
+                {/*  BIO WITH LIMIT */}
                 <p className={styles.bio}>
                   {showFullBio
                     ? userProfile?.bio
@@ -151,44 +148,45 @@ export default function ViewProfilePage({ userProfile }) {
             </div>
 
             {/* RIGHT */}
-            <div className={styles.sidebar}>
-              <h3>Recent Activity</h3>
+              <div className={styles.sidebar}>
+                <h3>Recent Activity</h3>
 
-              {userPosts.length > 0 ? (
-                userPosts.map((post) => (
-                  <div key={post._id} className={styles.activityCard}>
-                    {post.media && (
+                {/* {console.log(authState.posts)} */}
+
+                {userPosts.length > 0 ? (
+                  <div className={styles.activityCard}>
+                    {userPosts[0].media && (
                       <img
-                        src={`${BASE_URL}/${post.media}`}
+                        src={`${BASE_URL}/${userPosts[0].media}`}
                         className={styles.activityImage}
                       />
                     )}
                     <div>
-                      <p>{post.body}</p>
-                      <span className={styles.tag}>Post</span>
+                      <p>{userPosts[0].body}</p>
+                      <span className={styles.tag}>Latest</span>
                     </div>
                   </div>
-                ))
-              ) : (
-                <p>No activity</p>
-              )}
+                ) : (
+                  <div className={styles.noActivity}>No activity</div>
+                )}
+              </div>
             </div>
-          </div>
 
           {/* WORK */}
           <div className={styles.workSection}>
             <h3>Work History</h3>
 
-            <div className={styles.workGrid}>
-              {userProfile?.pastWork?.map((work, index) => (
-                <div key={index} className={styles.workCard}>
-                  <strong>
-                    {work.company} - {work.position}
-                  </strong>
-                  <p>{work.year}</p>
-                </div>
-              ))}
-            </div>
+             <div className={styles.workGrid}>
+                {(userProfile?.pastWork || []).map((w, i) => (
+                  <div key={i} className={styles.workCard}>
+                    <div className={styles.workTop}>
+                      <h5>{w.position}</h5>
+                      <span>{w.year}</span>
+                    </div>
+                    <p className={styles.company}>{w.company}</p>
+                  </div>
+                ))}
+              </div>
           </div>
         </div>
       </DashboardLayout>

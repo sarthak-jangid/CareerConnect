@@ -15,16 +15,25 @@ export default function ProfilePage() {
   const [error, setError] = useState(null);
   const [userPosts, setUserPosts] = useState([]);
 
+  // NAME
   const [editingName, setEditingName] = useState(false);
   const [tempName, setTempName] = useState("");
 
+  // BIO
   const [editingBio, setEditingBio] = useState(false);
   const [tempBio, setTempBio] = useState("");
-
-  // ✅ NEW STATES
   const [showFullBio, setShowFullBio] = useState(false);
+
   const BIO_LIMIT = 120;
   const BIO_MAX = 200;
+
+  // WORK
+  const [addingWork, setAddingWork] = useState(false);
+  const [workForm, setWorkForm] = useState({
+    company: "",
+    position: "",
+    year: "",
+  });
 
   const dispatch = useDispatch();
 
@@ -33,7 +42,6 @@ export default function ProfilePage() {
       setIsLoading(true);
       setError(null);
       try {
-        await dispatch(fetchCurrUser()).unwrap();
         await dispatch(getAllPosts());
       } catch {
         setError("Failed to load profile");
@@ -47,30 +55,42 @@ export default function ProfilePage() {
   useEffect(() => {
     if (authState.user && postState.postFetched) {
       const posts = (postState.posts || []).filter(
-        (post) =>
-          post?.userId?.username === authState.user.userId.username
+        (post) => post?.userId?.username === authState.user.userId.username
       );
       setUserPosts(posts);
     }
   }, [authState.user, postState]);
 
-  const updateProfilePicture = async (file) => {
+  // ================= WORK =================
+  const addWork = async () => {
+    const { company, position, year } = workForm;
+
+    if (!company || !position || !year) {
+      return alert("All fields required");
+    }
+
     try {
       setIsLoading(true);
-      const formData = new FormData();
-      formData.append("profile_picture", file);
 
-      const res = await clientServer.post("/update_profile_picture", formData);
-      alert(res.data.message || "Updated");
+      await clientServer.post("/update_profile_data", {
+        pastWork: [
+          ...(authState.user.pastWork || []),
+          { company, position, year },
+        ],
+      });
 
       await dispatch(fetchCurrUser());
+
+      setAddingWork(false);
+      setWorkForm({ company: "", position: "", year: "" });
     } catch (err) {
-      alert(err.response?.data?.message || "Error");
+      alert(err.response?.data?.message || "Failed to add work");
     } finally {
       setIsLoading(false);
     }
   };
 
+  // ================= NAME =================
   const updateUserName = async (name) => {
     if (!name.trim()) return alert("Name required");
 
@@ -86,6 +106,7 @@ export default function ProfilePage() {
     }
   };
 
+  // ================= BIO =================
   const updateBio = async (bio) => {
     try {
       setIsLoading(true);
@@ -94,6 +115,22 @@ export default function ProfilePage() {
       setEditingBio(false);
     } catch (err) {
       alert(err.response?.data?.message || "Bio update failed");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // ================= PROFILE PIC =================
+  const updateProfilePicture = async (file) => {
+    try {
+      setIsLoading(true);
+      const formData = new FormData();
+      formData.append("profile_picture", file);
+
+      await clientServer.post("/update_profile_picture", formData);
+      await dispatch(fetchCurrUser());
+    } catch (err) {
+      alert(err.response?.data?.message || "Error");
     } finally {
       setIsLoading(false);
     }
@@ -118,7 +155,6 @@ export default function ProfilePage() {
                     (e.target.src = `${BASE_URL}/default.jpg`)
                   }
                 />
-
                 <label className={styles.profileOverlay}>
                   Edit
                   <input
@@ -151,7 +187,7 @@ export default function ProfilePage() {
                           onClick={() => updateUserName(tempName)}
                           className={styles.saveBtn}
                         >
-                          ✔
+                          Save
                         </button>
 
                         <button
@@ -161,7 +197,7 @@ export default function ProfilePage() {
                           }}
                           className={styles.cancelBtn}
                         >
-                          ✖
+                          Cancel
                         </button>
                       </div>
                     </div>
@@ -199,7 +235,6 @@ export default function ProfilePage() {
                         }}
                         className={styles.bioInput}
                         rows={3}
-                        autoFocus
                       />
 
                       <small className={styles.charCount}>
@@ -211,7 +246,7 @@ export default function ProfilePage() {
                           onClick={() => updateBio(tempBio)}
                           className={styles.saveBtn}
                         >
-                          ✔
+                          Save
                         </button>
 
                         <button
@@ -221,7 +256,7 @@ export default function ProfilePage() {
                           }}
                           className={styles.cancelBtn}
                         >
-                          ✖
+                          Cancel
                         </button>
                       </div>
                     </div>
@@ -265,7 +300,9 @@ export default function ProfilePage() {
 
               {/* SIDEBAR */}
               <div className={styles.sidebar}>
-                <h3>Recent Activity</h3>
+                <h3 style={{marginBottom : "0.5rem"}}>Recent Activity</h3>
+
+                {/* {console.log(authState.posts)} */}
 
                 {userPosts.length > 0 ? (
                   <div className={styles.activityCard}>
@@ -285,17 +322,80 @@ export default function ProfilePage() {
                 )}
               </div>
             </div>
-
             {/* WORK */}
             <div className={styles.workSection}>
-              <h4>Work History</h4>
+              <div className={styles.workHeader}>
+                <h4>Work History</h4>
+
+                <button
+                  className={styles.addWorkBtn}
+                  onClick={() => setAddingWork(!addingWork)}
+                >
+                  + Add Work
+                </button>
+              </div>
+
+              {addingWork && (
+                <div className={styles.workForm}>
+                  <input
+                    placeholder="Company"
+                    value={workForm.company}
+                    onChange={(e) =>
+                      setWorkForm({
+                        ...workForm,
+                        company: e.target.value,
+                      })
+                    }
+                  />
+
+                  <input
+                    placeholder="Position"
+                    value={workForm.position}
+                    onChange={(e) =>
+                      setWorkForm({
+                        ...workForm,
+                        position: e.target.value,
+                      })
+                    }
+                  />
+
+                  <input
+                    type="text"
+                    placeholder="Year"
+                    maxLength={4}
+                    value={workForm.year}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/[^0-9]/g, "");
+                      setWorkForm({
+                        ...workForm,
+                        year: value,
+                      });
+                    }}
+                  />
+
+                  <div className={styles.formActions}>
+                    <button onClick={addWork} className={styles.saveBtn}>
+                      Save
+                    </button>
+
+                    <button
+                      onClick={() => setAddingWork(false)}
+                      className={styles.cancelBtn}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <div className={styles.workGrid}>
                 {(authState.user.pastWork || []).map((w, i) => (
                   <div key={i} className={styles.workCard}>
-                    <p>
-                      <strong>{w.company}</strong> - {w.position}
-                    </p>
-                    <span>{w.year}</span>
+                    <div className={styles.workTop}>
+                      <h5>{w.position}</h5>
+                      <span>{w.year}</span>
+                    </div>
+                    <p className={styles.company}>{w.company}</p>
                   </div>
                 ))}
               </div>
