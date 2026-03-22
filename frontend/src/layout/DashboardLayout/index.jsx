@@ -13,9 +13,17 @@ function DashboardLayout({ children }) {
     typeof window !== "undefined" ? window.innerWidth : 1200,
   );
 
-  const { user, isLoading, allProfilesFetched, allUsers } = useSelector(
-    (state) => state.auth,
-  );
+  const { user, isLoading, allProfilesFetched, allUsers, profileFetched } =
+    useSelector((state) => state.auth);
+
+  useEffect(() => {
+    // Only redirect if:
+    // 1. user is null
+    // 2. current user fetch is complete (profileFetched)
+    if (!user && profileFetched) {
+      router.replace("/login");
+    }
+  }, [user, profileFetched, router]);
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -31,7 +39,7 @@ function DashboardLayout({ children }) {
     }
   }, [dispatch, router, user]);
 
-  if (isLoading || user === null) {
+  if (isLoading || user === true) {
     return <div className={styles.loader}>Loading...</div>;
   }
 

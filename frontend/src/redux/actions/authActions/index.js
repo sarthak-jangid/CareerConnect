@@ -133,3 +133,24 @@ export const acceptConnectionRequest = createAsyncThunk(
     }
   },
 );
+
+export const logoutUser = createAsyncThunk(
+  "user/logoutUser",
+  async (_, { dispatch, rejectWithValue }) => {
+    try {
+      // Call logout API
+      const response = await clientServer.post(
+        "/logout",
+        {}, // no body needed
+        { withCredentials: true }, // important for cookie
+      );
+
+      return response.data; // { message: "Logged out successfully" }
+    } catch (error) {
+      console.error("Logout error:", error);
+      return rejectWithValue(
+        error.response?.data || { message: error.message },
+      );
+    }
+  },
+);

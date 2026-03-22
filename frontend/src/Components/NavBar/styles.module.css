@@ -81,3 +81,19 @@
   background: #2c6cbf;
 }
 
+/* Logout button */
+.logoutBtn {
+  padding: 6px 14px;
+  font-size: 13px;
+  border-radius: 20px;
+  border: none;
+  background: #ef4444;
+  cursor: pointer;
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.logoutBtn:hover {
+  background: #dc2626;
+  font-size: 13.4px;
+}

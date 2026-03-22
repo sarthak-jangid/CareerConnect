@@ -7,8 +7,9 @@ import {
   sendConnectionRequest,
   getConnectionsRequest,
   getMyConnectionRequests,
+  logoutUser,
 } from "../../actions/authActions";
- 
+
 const initialState = {
   user: null,
   isLoggedIn: false,
@@ -82,16 +83,16 @@ const authSlice = createSlice({
     // fetch current user ...
     builder
       .addCase(fetchCurrUser.pending, (state) => {
-        state.isLoading = true;
+        // state.isLoading = true;
         state.profileFetched = false;
       })
       .addCase(fetchCurrUser.fulfilled, (state, action) => {
-        state.isLoading = false;
+        // state.isLoading = false;
         state.profileFetched = true;
         state.user = action.payload.userProfile;
       })
       .addCase(fetchCurrUser.rejected, (state, action) => {
-        state.isLoading = false;
+        // state.isLoading = false;
         state.isError = true;
         state.user = null;
         state.status = "failed";
@@ -166,6 +167,27 @@ const authSlice = createSlice({
         state.isError = true;
         state.isSuccess = false;
         state.message = action.payload || "Failed to get my connections";
+      })
+
+      // logout
+      .addCase(logoutUser.pending, (state) => {
+        state.isLoading = true;
+        state.message = "Logging out...";
+        state.isError = false;
+        state.isSuccess = false;
+      })
+      .addCase(logoutUser.fulfilled, (state, action) => {
+        // Reset everything using the reset reducer logic
+        return {
+          ...initialState,
+          message: action.payload?.message || "Logged out successfully",
+        };
+      })
+      .addCase(logoutUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.isSuccess = false;
+        state.message = action.payload?.message || "Logout failed";
       });
   },
 });

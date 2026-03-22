@@ -55,7 +55,7 @@ export default function ProfilePage() {
   useEffect(() => {
     if (authState.user && postState.postFetched) {
       const posts = (postState.posts || []).filter(
-        (post) => post?.userId?.username === authState.user.userId.username
+        (post) => post?.userId?.username === authState.user.userId.username,
       );
       setUserPosts(posts);
     }
@@ -149,20 +149,20 @@ export default function ProfilePage() {
             <div className={styles.backDropContainer}>
               <div className={styles.profileImageWrapper}>
                 <img
-                  src={`${BASE_URL}/${authState.user.userId.profilePicture}`}
-                  alt="profile"
-                  onError={(e) =>
-                    (e.target.src = `${BASE_URL}/default.jpg`)
+                  src={
+                    authState.user?.userId?.profilePicture
+                      ? `${BASE_URL}/${authState.user.userId.profilePicture}`
+                      : `${BASE_URL}/default.jpg`
                   }
+                  alt="profile"
+                  onError={(e) => (e.target.src = `${BASE_URL}/default.jpg`)}
                 />
                 <label className={styles.profileOverlay}>
                   Edit
                   <input
                     type="file"
                     hidden
-                    onChange={(e) =>
-                      updateProfilePicture(e.target.files[0])
-                    }
+                    onChange={(e) => updateProfilePicture(e.target.files[0])}
                   />
                 </label>
               </div>
@@ -273,13 +273,9 @@ export default function ProfilePage() {
                           authState.user.bio.length > BIO_LIMIT && (
                             <span
                               className={styles.seeMore}
-                              onClick={() =>
-                                setShowFullBio(!showFullBio)
-                              }
+                              onClick={() => setShowFullBio(!showFullBio)}
                             >
-                              {showFullBio
-                                ? " See less"
-                                : "... See more"}
+                              {showFullBio ? " See less" : "... See more"}
                             </span>
                           )}
                       </p>
@@ -300,7 +296,7 @@ export default function ProfilePage() {
 
               {/* SIDEBAR */}
               <div className={styles.sidebar}>
-                <h3 style={{marginBottom : "0.5rem"}}>Recent Activity</h3>
+                <h3 style={{ marginBottom: "0.5rem" }}>Recent Activity</h3>
 
                 {/* {console.log(authState.posts)} */}
 

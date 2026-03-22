@@ -180,6 +180,28 @@ export const login = async (req, res) => {
   }
 };
 
+export const logout = async (req, res) => {
+  try {
+    const token = req.cookies.token; // get token from httpOnly cookie
+    if (!token) return res.status(400).json({ message: "Already logged out" });
+
+    // Clear token in DB
+    await User.findOneAndUpdate({ token }, { token: "" });
+
+    // Clear cookie
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
+    });
+
+    return res.status(200).json({ message: "Logged out successfully" });
+  } catch (err) {
+    console.error("Logout error:", err);
+    return res.status(500).json({ message: "Logout failed" });
+  }
+};
+
 /**
  * UPLOAD PROFILE PICTURE: Update user's profile picture
  * Requires authentication via token
@@ -198,8 +220,7 @@ export const uploadProfilePicture = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-
-    console.log(req.file)
+    console.log(req.file);
 
     user.profilePicture = req.file.filename;
     await user.save();
@@ -298,7 +319,7 @@ export const getUserAndProfile = async (req, res) => {
 export const updateProfileData = async (req, res) => {
   try {
     const token = getTokenFromRequest(req);
-    const { ...newProfileData } = req.body; 
+    const { ...newProfileData } = req.body;
 
     // ✅ AUTHENTICATION CHECK: Verify user is logged in
     const user = await User.findOne({ token: token });
@@ -379,13 +400,15 @@ export const sendConnectionRequest = async (req, res) => {
 
     // ✅ FIX: Prevent users from sending connection requests to themselves
     if (user._id.toString() === connectionId) {
-      return res.status(400).json({ message: "You cannot send a connection request to yourself" });
+      return res
+        .status(400)
+        .json({ message: "You cannot send a connection request to yourself" });
     }
 
     const connectionUser = await User.findById(connectionId);
     if (!connectionUser)
       return res.status(404).json({ message: "Connection user not found" });
-    
+
     // Check if the connection request already exists
     const existingRequest = await ConnectionRequest.findOne({
       userId: user._id,
@@ -420,7 +443,7 @@ export const sendConnectionRequest = async (req, res) => {
  */
 export const getMyConnectionRequests = async (req, res) => {
   try {
-    console.log("also work here in start ...")
+    console.log("also work here in start ...");
     const token = getTokenFromRequest(req);
     const user = await User.findOne({ token });
     if (!user) return res.status(404).json({ message: "User not found" });
