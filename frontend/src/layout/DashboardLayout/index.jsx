@@ -101,7 +101,7 @@ function DashboardLayout({ children }) {
           </div>
         </div>
 
-        <div className="homeContainer_feedBar">{children}</div>
+        <div className={styles.homeContainer_feedBar}>{children}</div>
         <div className={styles.homeContainer_extraContainer}>
           <h3>Top Profiles</h3>
 

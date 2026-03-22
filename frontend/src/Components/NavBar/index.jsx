@@ -32,7 +32,7 @@ export default function NavBar() {
               </p>
 
               <button onClick={() => {
-                router.push("/dashboard")
+                router.push("/profile")
               }} className={styles.profileBtn}>
                 Profile
               </button>

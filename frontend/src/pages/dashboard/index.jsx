@@ -166,8 +166,8 @@ const Dashboard = () => {
                 {/* Body */}
                 <p className={styles.postText}>{post.body}</p>
 
-                {/* Media */}
-                {post.media && (
+                {/* Media - only show for actual media files, not text posts */}
+                {post.media && post.media !== "text_post" && (
                   <div className={styles.mediaContainer}>
                     <img
                       className={styles.postImage}

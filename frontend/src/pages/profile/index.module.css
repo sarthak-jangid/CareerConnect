@@ -1,0 +1,252 @@
+.container {
+  padding: 1.5rem;
+  overflow-x: hidden;
+}
+
+.center {
+  text-align: center;
+  padding: 2rem;
+}
+
+.centerError {
+  text-align: center;
+  color: red;
+}
+
+/* ================= BACKDROP ================= */
+.backDropContainer {
+  height: 30vh;
+  background: url("https://images.pexels.com/photos/11121564/pexels-photo-11121564.jpeg");
+  background-size: cover;
+  background-position: center;
+  border-radius: 20px;
+  position: relative;
+}
+
+/* COVER EDIT BUTTON */
+.coverOverlay {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: 0.2s;
+}
+
+.coverOverlay:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+/* ================= PROFILE IMAGE ================= */
+.profileImageWrapper {
+  position: absolute;
+  bottom: -50px;
+  left: 30px;
+  width: 110px;
+  height: 110px;
+}
+
+.profileImageWrapper img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid white;
+}
+
+/* PROFILE HOVER OVERLAY */
+.profileOverlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  opacity: 0;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* HOVER EFFECT FIXED */
+.profileImageWrapper:hover .profileOverlay {
+  opacity: 1;
+}
+
+/* HIDE INPUT */
+.profileOverlay input,
+.coverOverlay input {
+  display: none;
+}
+
+/* ================= PROFILE SECTION ================= */
+.profileContainer {
+  display: flex;
+  gap: 2rem;
+  margin-top: 70px;
+}
+
+.leftSection {
+  flex: 1;
+}
+
+/* ================= NAME ================= */
+.nameSection {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nameDisplay {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.editBtn {
+  opacity: 0;
+  cursor: pointer;
+  transition: 0.2s;
+  filter: grayscale(100%);
+}
+
+.nameDisplay:hover .editBtn {
+  opacity: 1;
+}
+
+.editBtn:hover {
+  transform: scale(1.2);
+}
+
+.username {
+  color: gray;
+}
+
+/* ================= INLINE EDIT ================= */
+.nameEditInline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.nameInput {
+  width: 100%;
+  max-width: 400px;
+  min-width: 0;
+
+  border: none;
+  border-bottom: 2px solid #ccc;
+  padding: 6px;
+  font-size: 1.2rem;
+  outline: none;
+}
+
+.nameInput:focus {
+  border-bottom: 2px solid black;
+}
+
+/* ================= BUTTONS ================= */
+.inlineActions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.saveBtn,
+.cancelBtn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.2s;
+}
+
+.saveBtn:hover {
+  color: green;
+  transform: scale(1.2);
+}
+
+.cancelBtn:hover {
+  color: red;
+  transform: scale(1.2);
+}
+
+/* ================= BIO ================= */
+.bio {
+  margin-top: 10px;
+}
+
+/* ================= SIDEBAR ================= */
+.sidebar {
+  width: 260px;
+  background: #f9fafb;
+  padding: 1rem;
+  border-radius: 12px;
+}
+
+/* ================= ACTIVITY ================= */
+.activityCard {
+  display: flex;
+  gap: 10px;
+}
+
+.activityImage {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.tag {
+  font-size: 0.7rem;
+  color: blue;
+}
+
+/* ================= WORK ================= */
+.workSection {
+  margin-top: 2rem;
+}
+
+.workGrid {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.workCard {
+  padding: 1rem;
+  background: white;
+  border-radius: 10px;
+}
+
+/* ================= MOBILE ================= */
+@media (max-width: 768px) {
+  .profileContainer {
+    flex-direction: column;
+    margin-top: 80px;
+  }
+
+  .sidebar {
+    width: 100%;
+  }
+
+  .nameInput {
+    max-width: 100%;
+  }
+
+  /* center avatar */
+  .profileImageWrapper {
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: -50px;
+  }
+}

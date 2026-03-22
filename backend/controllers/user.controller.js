@@ -6,9 +6,14 @@ import PDFDocument from "pdfkit";
 import fs from "fs";
 import ConnectionRequest from "../models/connections.model.js";
 
-// helper: read token from cookie / Authorization header / body (fallback)
+/**
+ * HELPER FUNCTION: Extract authentication token from request
+ * Checks in order: cookies, Authorization header (Bearer), request body
+ * @param {Object} req - Express request object
+ * @returns {String|undefined} - Token string or undefined if not found
+ */
 const getTokenFromRequest = (req) => {
-  console.log(" get token work");
+  console.log("get token work");
   return (
     req.cookies?.token || // cookie name "token"
     (req.headers?.authorization?.startsWith("Bearer ")
@@ -18,8 +23,12 @@ const getTokenFromRequest = (req) => {
   );
 };
 
-// convert User Profile to PDF ...
-
+/**
+ * UTILITY: Convert user profile data to PDF document
+ * Generates a formatted PDF with user info, bio, and work history
+ * @param {Object} userProfile - Profile object with userId reference
+ * @returns {Promise<String>} - Path to generated PDF file
+ */
 const convertUserDataToPDF = async (userProfile) => {
   const doc = new PDFDocument();
   const outputPath = crypto.randomBytes(32).toString("hex") + ".pdf";
@@ -45,9 +54,20 @@ const convertUserDataToPDF = async (userProfile) => {
   return outputPath;
 };
 
-// Routes .......................................................
+// ============================================
+// AUTHENTICATION ENDPOINTS
+// ============================================
 
-// Register route ...
+/**
+ * REGISTER: Create a new user account
+ * Validates input, hashes password, creates User and Profile records, and issues auth token
+ * @route POST /register
+ * @param {String} name - User's full name (min 2 chars)
+ * @param {String} email - User's email (must be valid and unique)
+ * @param {String} password - User's password (min 6 chars, should be hashed on client too)
+ * @param {String} username - User's username (min 3 chars, must be unique)
+ * @returns {Object} - { message: "User registered successfully" } with token cookie
+ */
 export const register = async (req, res) => {
   try {
     const { name, email, password, username } = req.body;
@@ -116,8 +136,12 @@ export const register = async (req, res) => {
   }
 };
 
-// Login route ...
-
+// LOGIN: Authenticate user and issue token
+// Validates credentials, checks password, and sets httpOnly token cookie
+// @route POST /login
+// @param {String} email - User's registered email
+// @param {String} password - User's plaintext password (compared against hashed version)
+// @returns {Object} - { message: "Logged in successfully" } with token cookie
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -156,14 +180,26 @@ export const login = async (req, res) => {
   }
 };
 
+/**
+ * UPLOAD PROFILE PICTURE: Update user's profile picture
+ * Requires authentication via token
+ * @route POST /upload-profile-picture
+ * @requires Authorization (token in cookie, header, or body)
+ * @param {File} file - Uploaded image file (via multer middleware)
+ * @returns {Object} - { message: "Profile picture updated successfully" }
+ */
 export const uploadProfilePicture = async (req, res) => {
   const token = getTokenFromRequest(req);
 
+  // ✅ AUTHENTICATION CHECK: Verify user is logged in
   try {
     const user = await User.findOne({ token: token });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
+
+
+    console.log(req.file)
 
     user.profilePicture = req.file.filename;
     await user.save();
@@ -176,10 +212,20 @@ export const uploadProfilePicture = async (req, res) => {
   }
 };
 
+/**
+ * UPDATE USER PROFILE: Modify user's basic account info (name, email, username, etc.)
+ * Requires authentication and checks for duplicate email/username
+ * @route PUT /update-profile
+ * @requires Authorization (token)
+ * @param {Object} body - Fields to update (name, email, username, etc.)
+ * @returns {Object} - { message: "User profile updated successfully" }
+ */
 export const updateUserProfile = async (req, res) => {
   try {
     const token = getTokenFromRequest(req);
     const { ...newUserData } = req.body; // body contains profile fields only
+
+    // ✅ AUTHENTICATION CHECK: Verify user is logged in
     const user = await User.findOne({ token: token });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -209,11 +255,19 @@ export const updateUserProfile = async (req, res) => {
   }
 };
 
+/**
+ * GET USER AND PROFILE: Fetch the logged-in user's own profile
+ * Requires authentication
+ * @route GET /user-profile
+ * @requires Authorization (token)
+ * @returns {Object} - { userProfile: { userId: {...}, bio, pastWork, ... } }
+ */
 export const getUserAndProfile = async (req, res) => {
   try {
     console.log("ok backend");
     const token = getTokenFromRequest(req);
 
+    // ✅ AUTHENTICATION CHECK: Verify user is logged in
     const user = await User.findOne({ token: token });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -221,7 +275,7 @@ export const getUserAndProfile = async (req, res) => {
 
     const userProfile = await Profile.findOne({ userId: user._id }).populate(
       "userId",
-      "name email username profilePicture "
+      "name email username profilePicture ",
     );
     if (!userProfile) {
       return res.status(404).json({ message: "Profile not found" });
@@ -233,10 +287,20 @@ export const getUserAndProfile = async (req, res) => {
   }
 };
 
+/**
+ * UPDATE PROFILE DATA: Modify user's profile info (bio, pastWork, currentPost, etc.)
+ * Requires authentication
+ * @route PUT /update-profile-data
+ * @requires Authorization (token)
+ * @param {Object} body - Profile fields to update (bio, pastWork, currentPost, etc.)
+ * @returns {Object} - { message: "Profile updated successfully" }
+ */
 export const updateProfileData = async (req, res) => {
   try {
     const token = getTokenFromRequest(req);
-    const { ...newProfileData } = req.body;
+    const { ...newProfileData } = req.body; 
+
+    // ✅ AUTHENTICATION CHECK: Verify user is logged in
     const user = await User.findOne({ token: token });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -256,11 +320,17 @@ export const updateProfileData = async (req, res) => {
   }
 };
 
+/**
+ * GET ALL USER PROFILES: Fetch all users' profiles (public endpoint)
+ * No authentication required; returns all user profiles for discovery
+ * @route GET /all-profiles
+ * @returns {Object} - { profiles: [ { userId: {...}, bio, pastWork, ... }, ... ] }
+ */
 export const getAllUserProfile = async (req, res) => {
   try {
     const profiles = await Profile.find().populate(
       "userId",
-      "name email username profilePicture"
+      "name email username profilePicture",
     );
     return res.status(200).json({ profiles });
   } catch (error) {
@@ -268,11 +338,18 @@ export const getAllUserProfile = async (req, res) => {
   }
 };
 
+/**
+ * DOWNLOAD PROFILE: Generate and download user profile as PDF
+ * No authentication required; public endpoint
+ * @route GET /download-profile?id=<userId>
+ * @param {String} id - Target user's ID (via query param)
+ * @returns {Object} - { message: "<outputPath to PDF file>" }
+ */
 export const downloadProfile = async (req, res) => {
   const user_id = req.query.id;
   const userProfile = await Profile.findOne({ userId: user_id }).populate(
     "userId",
-    "name email username profilePicture"
+    "name email username profilePicture",
   );
 
   let outputPath = await convertUserDataToPDF(userProfile);
@@ -280,6 +357,18 @@ export const downloadProfile = async (req, res) => {
   return res.status(200).json({ message: outputPath });
 };
 
+// ============================================
+// CONNECTION MANAGEMENT ENDPOINTS
+// ============================================
+
+/**
+ * SEND CONNECTION REQUEST: Send a connection request to another user
+ * Requires authentication; prevents duplicate requests
+ * @route POST /send-connection-request
+ * @requires Authorization (token)
+ * @param {String} connectionId - ID of user to connect with
+ * @returns {Object} - { message: "Connection request sent" }
+ */
 export const sendConnectionRequest = async (req, res) => {
   try {
     const token = getTokenFromRequest(req);
@@ -288,11 +377,16 @@ export const sendConnectionRequest = async (req, res) => {
     const user = await User.findOne({ token });
     if (!user) return res.status(404).json({ message: "User not found" });
 
+    // ✅ FIX: Prevent users from sending connection requests to themselves
+    if (user._id.toString() === connectionId) {
+      return res.status(400).json({ message: "You cannot send a connection request to yourself" });
+    }
+
     const connectionUser = await User.findById(connectionId);
     if (!connectionUser)
       return res.status(404).json({ message: "Connection user not found" });
+    
     // Check if the connection request already exists
-
     const existingRequest = await ConnectionRequest.findOne({
       userId: user._id,
       connectionId: connectionId,
@@ -317,8 +411,16 @@ export const sendConnectionRequest = async (req, res) => {
   }
 };
 
-export const getMyConnectionsRequests = async (req, res) => {
+/**
+ * GET MY CONNECTION REQUESTS: Fetch all pending connection requests sent by the logged-in user
+ * Requires authentication
+ * @route GET /my-connection-requests
+ * @requires Authorization (token)
+ * @returns {Object} - { connections: [ { userId, connectionId, status, ... }, ... ] }
+ */
+export const getMyConnectionRequests = async (req, res) => {
   try {
+    console.log("also work here in start ...")
     const token = getTokenFromRequest(req);
     const user = await User.findOne({ token });
     if (!user) return res.status(404).json({ message: "User not found" });
@@ -331,6 +433,13 @@ export const getMyConnectionsRequests = async (req, res) => {
   }
 };
 
+/**
+ * GET MY CONNECTIONS: Fetch all pending connection requests received by the logged-in user
+ * Requires authentication
+ * @route GET /my-connections
+ * @requires Authorization (token)
+ * @returns {Object} - { connections: [ { userId, connectionId, status, ... }, ... ] }
+ */
 export const whatAreMyConnections = async (req, res) => {
   try {
     const token = getTokenFromRequest(req);
@@ -346,6 +455,15 @@ export const whatAreMyConnections = async (req, res) => {
   }
 };
 
+/**
+ * ACCEPT/REJECT CONNECTION REQUEST: Respond to a received connection request
+ * Requires authentication; updates request status (accept/reject)
+ * @route POST /respond-connection-request
+ * @requires Authorization (token)
+ * @param {String} requestId - Connection request ID
+ * @param {String} action_type - "accept" or "reject"
+ * @returns {Object} - { message: "Connection request updated" }
+ */
 export const acceptConnectionRequest = async (req, res) => {
   try {
     const token = getTokenFromRequest(req);
@@ -365,7 +483,49 @@ export const acceptConnectionRequest = async (req, res) => {
       connection.status_accepted = false;
     }
 
+    connection.save();
+
     return res.status(200).json({ message: "Connection request updated" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+/**
+ * GET USER PROFILE BY USERNAME: Fetch user and profile data using username
+ * 🔒 SECURITY NOTE: Should this require authentication?
+ * ✅ ANSWER: Currently PUBLIC (no login required) because this is a networking app
+ *    where users should be discoverable. If you want PRIVATE profiles, add auth check below.
+ *
+ * @route GET /profile/:username (or query param)
+ * @param {String} username - The target user's username (via query or URL param)
+ * @returns {Object} - { userProfile: { userId: {...}, bio, pastWork, ... } }
+ *
+ * TO REQUIRE LOGIN: Uncomment the auth check below (lines marked with 🔒)
+ */
+export const getUserProfileAndUserBasedOnUsername = async (req, res) => {
+  try {
+    const { username } = req.query;
+
+    // 🔒 OPTIONAL: Uncomment below 3 lines to require user to be logged in
+    // const token = getTokenFromRequest(req);
+    // const loggedInUser = await User.findOne({ token });
+    // if (!loggedInUser) return res.status(401).json({ message: "Please log in to view profiles" });
+
+    // Fetch target user by username
+    const user = await User.findOne({
+      username,
+    });
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // Populate user's profile with full user details
+    const userProfile = await Profile.findOne({ userId: user._id }).populate(
+      "userId",
+      "name email username profilePicture",
+    );
+
+    return res.status(200).json({ userProfile });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }

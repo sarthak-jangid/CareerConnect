@@ -16,6 +16,7 @@
   gap: 1rem;
   align-items: start;
   margin-top: 1.3rem;
+  border-right: 1px solid rgba(220, 220, 220, 0.5);
 }
 
 .sideBarOption {
@@ -31,7 +32,10 @@
   cursor: pointer;
   border-radius: 6px;
 
-  transition: background-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.15s ease;
 }
 
 .sideBarOption:hover {
@@ -46,5 +50,10 @@
 
 .homeContainer_extraContainer {
   margin-top: 1.3rem;
+  border-left: 1px solid rgba(220, 220, 220, 0.5);
+  padding-left: 1.5rem;
 }
 
+.homeContainer_feedBar {
+  padding: 1.5rem;
+}

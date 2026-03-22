@@ -27,8 +27,8 @@ export const createPost = async (req, res) => {
     let newPost = new Post({
       userId: user._id,
       body: postContent,
-      media: req.file ? req.file.filename : "",
-      fileType: req.file ? req.file.mimetype.split("/")[1] : "",
+      media: req.file ? req.file.filename : "text_post",
+      fileType: req.file ? req.file.mimetype.split("/")[1] : "text",
     });
     await newPost.save();
 
@@ -47,7 +47,9 @@ export const getAllPosts = async (req, res) => {
   try {
     const token = getTokenFromRequest(req);
     const user = token ? await User.findOne({ token }) : null;
-    const posts = await Post.find().sort({ createdAt: -1 }).populate("userId");
+    const posts = await Post.find()
+      .sort({ createdAt: -1 })
+      .populate("userId", "-password -token -__v");
     const postsWithLikeStatus = posts.map((post) => ({
       ...post.toObject(),
       hasLiked: user ? post.likedBy.includes(user._id) : false,

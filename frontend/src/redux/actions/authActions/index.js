@@ -5,19 +5,17 @@ export const registerUser = createAsyncThunk(
   "auth/registerUser",
   async (userData, ThunkAPI) => {
     try {
-      // console.log("ok");
       const response = await clientServer.post("/register", {
         username: userData.username,
         password: userData.password,
         email: userData.email,
         name: userData.name,
       });
-      // console.log(response);
       return response.data;
     } catch (error) {
       return ThunkAPI.rejectWithValue(error.response.data);
     }
-  }
+  },
 );
 
 export const loginUser = createAsyncThunk(
@@ -30,29 +28,23 @@ export const loginUser = createAsyncThunk(
       });
       return response.data;
     } catch (error) {
-      // console.log(error.response)
-
-      // return proper payload for rejected action
       const message =
         error.response?.data?.message || error.message || "Login failed";
       return ThunkAPI.rejectWithValue(message);
     }
-  }
+  },
 );
 
 export const fetchCurrUser = createAsyncThunk(
   "user/fetchCurrUser",
   async (_, ThunkAPI) => {
     try {
-      // console.log("ok thunk")
       const response = await clientServer.get("/get_user_and_profile");
-      // console.log("thunk api")
-      // console.log(response.data)
       return ThunkAPI.fulfillWithValue(response.data);
     } catch (error) {
       return ThunkAPI.rejectWithValue(error.response.data);
     }
-  }
+  },
 );
 
 export const getAllUsers = createAsyncThunk(
@@ -64,5 +56,80 @@ export const getAllUsers = createAsyncThunk(
     } catch (error) {
       return ThunkAPI.rejectWithValue(error.response.data);
     }
-  }
+  },
+);
+
+/**
+ * SEND CONNECTION REQUEST: Send a connection request to another user
+ */
+export const sendConnectionRequest = createAsyncThunk(
+  "user/sendConnectionRequest",
+  async (connectionId, ThunkAPI) => {
+    try {
+      const response = await clientServer.post(
+        "/user/send_connection_request",
+        {
+          connectionId: connectionId,
+        },
+      );
+      return ThunkAPI.fulfillWithValue(response.data);
+    } catch (error) {
+      const message =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to send connection request";
+      return ThunkAPI.rejectWithValue(message);
+    }
+  },
+);
+
+export const getConnectionsRequest = createAsyncThunk(
+  "user/getConnectionsRequest",
+  async (_, ThunkAPI) => {
+    try {
+      const response = await clientServer.get("/user/get_connection_requests");
+      return ThunkAPI.fulfillWithValue(response.data);
+    } catch (error) {
+      return ThunkAPI.rejectWithValue(error.response.data);
+    }
+  },
+);
+
+export const getMyConnectionRequests = createAsyncThunk(
+  "user/getMyConnectionRequests",
+  async (_, ThunkAPI) => {
+    try {
+      // console.log("here it work ... ")
+      const response = await clientServer.post(
+        "/user/user_connection_requests",
+      );
+      return ThunkAPI.fulfillWithValue(response.data);
+    } catch (error) {
+      return ThunkAPI.rejectWithValue(error.response.data);
+    }
+  },
+);
+
+export const acceptConnectionRequest = createAsyncThunk(
+  "user/acceptConnectionRequest",
+  async (user, ThunkAPI) => {
+    try {
+      const response = await clientServer.post(
+        "/user/accept_connection_request",
+        {
+          requestId: user.connectionId,
+          action_type: user.action,
+        },
+      );
+      ThunkAPI.dispatch(getConnectionsRequest());
+      ThunkAPI.dispatch(getMyConnectionRequests());
+      return ThunkAPI.fulfillWithValue(response.data);
+    } catch (error) {
+      const message =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to accept connection request";
+      return ThunkAPI.rejectWithValue(message);
+    }
+  },
 );

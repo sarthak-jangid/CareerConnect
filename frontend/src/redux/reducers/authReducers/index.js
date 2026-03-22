@@ -4,8 +4,11 @@ import {
   loginUser,
   fetchCurrUser,
   getAllUsers,
+  sendConnectionRequest,
+  getConnectionsRequest,
+  getMyConnectionRequests,
 } from "../../actions/authActions";
-
+ 
 const initialState = {
   user: null,
   isLoggedIn: false,
@@ -62,7 +65,7 @@ const authSlice = createSlice({
         state.isSuccess = false;
         state.isError = false;
       })
-      .addCase(registerUser.fulfilled, (state, action) => {
+      .addCase(registerUser.fulfilled, (state) => {
         state.isLoading = false;
         state.isSuccess = true;
         state.message = "Registration is successful, Please Login";
@@ -84,7 +87,7 @@ const authSlice = createSlice({
       })
       .addCase(fetchCurrUser.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.profileFetched = true; //  fetch attempt completed
+        state.profileFetched = true;
         state.user = action.payload.userProfile;
       })
       .addCase(fetchCurrUser.rejected, (state, action) => {
@@ -93,17 +96,76 @@ const authSlice = createSlice({
         state.user = null;
         state.status = "failed";
         state.message = action.payload;
-        state.profileFetched = true; //  IMPORTANT (fetch completed)
+        state.profileFetched = true;
       });
 
     // get all users ...
     builder
-      .addCase(getAllUsers.pending, (state) => {})
+      .addCase(getAllUsers.pending, (state) => {
+        state.isLoading = true;
+      })
       .addCase(getAllUsers.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isError = false;
         state.allUsers = action.payload.profiles;
         state.allProfilesFetched = true;
+      })
+      .addCase(getAllUsers.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+      });
+
+    // send connection request ...
+    builder
+      .addCase(sendConnectionRequest.pending, (state) => {
+        state.connectionLoading = true;
+        state.message = "Sending connection request...";
+        state.isError = false;
+        state.isSuccess = false;
+      })
+      .addCase(sendConnectionRequest.fulfilled, (state) => {
+        state.connectionLoading = false;
+        state.isSuccess = true;
+        state.message = "Connection request sent successfully!";
+        state.isError = false;
+      })
+      .addCase(sendConnectionRequest.rejected, (state, action) => {
+        state.connectionLoading = false;
+        // Don't set error for "already sent" - treat as success for UI
+        if (action.payload !== "Connection request already sent") {
+          state.isError = true;
+        }
+        state.message = action.payload || "Failed to send connection request";
+        state.isSuccess = false;
+      });
+
+    // get connection requests ...
+    builder
+      .addCase(getConnectionsRequest.fulfilled, (state, action) => {
+        state.connections = action.payload.connections;
+        state.isError = false;
+        state.isSuccess = true;
+      })
+      .addCase(getConnectionsRequest.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.isSuccess = false;
+        state.message = action.payload || "Failed to get connections";
+      });
+
+    // get my connection requests ...
+    builder
+      .addCase(getMyConnectionRequests.fulfilled, (state, action) => {
+        state.connectionRequest = action.payload.connections;
+        state.isError = false;
+        state.isSuccess = true;
+      })
+      .addCase(getMyConnectionRequests.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.isSuccess = false;
+        state.message = action.payload || "Failed to get my connections";
       });
   },
 });
