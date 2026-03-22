@@ -24,7 +24,7 @@ export default function MyConnectionsPage() {
   useEffect(() => {
     if (authState.connectionRequest.length !== 0) {
       console.log("Connection requests:", authState.connectionRequest);
-    }   
+    }
   }, [authState.connectionRequest]);
 
   return (
@@ -33,8 +33,10 @@ export default function MyConnectionsPage() {
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           <h4>My Connections </h4>
           <div>
-            {authState.connectionRequest.length === 0 ? (
-              <p>No connection requests found.</p>
+            {authState.connectionRequest.filter(
+              (connection) => connection.status_accepted === null,
+            ).length === 0 ? (
+              <p style={{color : "gray", fontSize : "0.9rem", textAlign : "center"}} >No connection requests found.</p>
             ) : (
               authState.connectionRequest
                 .filter((connection) => connection.status_accepted === null)
@@ -61,10 +63,12 @@ export default function MyConnectionsPage() {
                           alt="profile picture"
                         />
                       </div>
+
                       <div className={styles.userInfo}>
                         <h3>{user.userId.name}</h3>
                         <p>{user.userId.username}</p>
                       </div>
+
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -90,7 +94,7 @@ export default function MyConnectionsPage() {
             {authState.connectionRequest.filter(
               (connection) => connection.status_accepted !== null,
             ).length != 0 ? (
-              <h4>My NetWork</h4>
+              <h4>My Network</h4>
             ) : (
               " "
             )}{" "}
