@@ -1,92 +1,165 @@
 .container {
-  display: flex;
-  flex-direction: column;
-  padding: 0.4rem;
-  border-radius: 20px;
-  background: rgba(233, 233, 232, 0.945);
-  gap: 1rem; 
+  padding: 1.5rem;
+  overflow-x: hidden;
 }
 
+/* BACKDROP */
 .backDropContainer {
-  width: 100%;
   height: 30vh;
   background: url("https://images.pexels.com/photos/11121564/pexels-photo-11121564.jpeg");
   background-size: cover;
-  background-repeat: no-repeat;
+  background-position: center;
+  border-radius: 20px;
   position: relative;
-  border-radius: 20px;
 }
 
-.backDropContainer img {
-  width: 8rem;
-  height: 8rem;
-  object-fit: cover;
-  border-radius: 50%;
+/* PROFILE IMAGE */
+.profileImageWrapper {
   position: absolute;
-  left: 3.5%;
-  bottom: -30%;
-  text-align: center;
+  bottom: -50px;
+  left: 30px;
+  width: 110px;
+  height: 110px;
 }
 
-.profileContainer_details {
-  padding-top: 4.6rem;
-  padding-bottom: 0.9rem; 
-  border-radius: 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+.profileImageWrapper img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid white;
 }
 
-.card {
+/* PROFILE SECTION */
+.profileContainer {
+  display: flex;
+  gap: 2rem;
+  margin-top: 70px;
+}
+
+.leftSection {
+  flex: 1;
+}
+
+/* NAME */
+.nameSection {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nameDisplay {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 10px;
 }
 
-.cardContent {
-  display: flex;
-  /* flex-direction: column;
-  gap: 0.5rem; */
+.username {
+  color: gray;
 }
 
-.cardContent > img {
-  width: 3.4rem;
-  height: auto;
-  height: 3.4rem;
-  object-fit: cover;
+/* BUTTONS */
+.connectButton {
+  padding: 6px 12px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.connectButton:hover {
+  background: #1d4ed8;
 }
 
 .connectedButton {
-  padding-inline: 0.8rem;
-  padding-block: 0.4rem;
-  background: rgba(216, 224, 231, 0.932);
-  color: rgba(3, 93, 183, 1);
-  border: 1px solid rgba(3, 93, 183, 1);
-  border-radius: 10px;
-  cursor: pointer;
+  padding: 6px 12px;
+  background: #e6f0ff;
+  color: #2563eb;
+  border: 1px solid #2563eb;
+  border-radius: 8px;
 }
 
-.connectButton {
-  padding-inline: 0.8rem;
-  padding-block: 0.4rem;
-  background: rgba(3, 93, 183, 0.905);
-  outline: none;
-  border: none;
-  color: white;
-  border-radius: 10px;
-  cursor: pointer;
+/* BIO */
+.bio {
+  margin-top: 10px;
+  max-width: 420px;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #374151;
 }
 
-.workHistoryContainer {
+/* SEE MORE */
+.seeMore {
+  color: #2563eb;
+  cursor: pointer;
+  font-weight: 500;
+  margin-left: 4px;
+  font-size: 0.9rem;
+}
+
+.seeMore:hover {
+  text-decoration: underline;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 260px;
+  background: #f9fafb;
+  padding: 1rem;
+  border-radius: 12px;
+}
+
+/* ACTIVITY */
+.activityCard {
   display: flex;
-  gap: 1.4rem;
-  padding-top: 1.4rem;
-  width: 100%;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.activityImage {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.tag {
+  font-size: 0.7rem;
+  color: blue;
+}
+
+/* WORK */
+.workSection {
+  margin-top: 2rem;
+}
+
+.workGrid {
+  display: flex;
+  gap: 1rem;
   flex-wrap: wrap;
 }
 
-.workHistoryCard {
-  min-width: fit-content;
-  padding-inline:2.5rem;
-  padding-block: 1rem;
+.workCard {
+  padding: 1rem;
+  background: white;
   border-radius: 10px;
-  box-shadow: 10px 10px 15px rgb(173, 173, 173);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .profileContainer {
+    flex-direction: column;
+    margin-top: 80px;
+  }
+
+  .sidebar {
+    width: 100%;
+  }
+
+  .profileImageWrapper {
+    left: 50%;
+    transform: translateX(-50%);
+  }
 }

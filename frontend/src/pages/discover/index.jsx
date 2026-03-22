@@ -18,7 +18,6 @@ export default function DiscoverPage() {
     }
   }, []);
 
-  //  FIX: Filter out current logged-in user from discovery list
   const filteredUsers = authState.allUsers
     ? authState.allUsers.filter(
         (user) => user.userId._id !== authState.user?.userId?._id
@@ -28,34 +27,50 @@ export default function DiscoverPage() {
   return (
     <UserLayout>
       <DashboardLayout>
-        <div style={{
-          paddingLeft: "1.3rem"
-        }}>
-          <h1>Discover ...</h1>
+        <div className={styles.container}>
+          <h1 className={styles.heading}>Discover People</h1>
 
-          <div className={styles.userList}>
+          <div className={styles.userGrid}>
             {authState.allProfilesFetched && filteredUsers.length > 0 ? (
               filteredUsers.map((user) => (
                 <div
-                  onClick={() => {
-                    router.push(`/view/${user.userId.username}`);
-                  }}
                   key={user._id}
                   className={styles.userCard}
+                  onClick={() =>
+                    router.push(`/view/${user.userId.username}`)
+                  }
                 >
                   <img
-                    className={styles.userCardImage}
+                    className={styles.avatar}
                     src={`${BASE_URL}/${user.userId.profilePicture}`}
                     alt="profile"
+                    loading="lazy"
+                    onError={(e) =>
+                      (e.target.src = `${BASE_URL}/default.jpg`)
+                    }
                   />
-                  <div>
-                    <h2>{user.userId.name}</h2>
-                    <p>{user.userId.username}</p>
-                  </div>
+
+                  <h3 className={styles.name}>
+                    {user.userId.name}
+                  </h3>
+
+                  <p className={styles.username}>
+                    @{user.userId.username}
+                  </p>
+
+                  {user.bio && (
+                    <p className={styles.bio}>
+                      {user.bio.length > 60
+                        ? user.bio.slice(0, 60) + "..."
+                        : user.bio}
+                    </p>
+                  )}
                 </div>
               ))
             ) : (
-              <p>No other users to discover</p>
+              <p className={styles.empty}>
+                No users to discover 🚀
+              </p>
             )}
           </div>
         </div>

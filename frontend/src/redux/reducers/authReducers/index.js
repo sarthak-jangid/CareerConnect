@@ -82,16 +82,16 @@ const authSlice = createSlice({
     // fetch current user ...
     builder
       .addCase(fetchCurrUser.pending, (state) => {
-        state.isLoading = true;
+        // state.isLoading = true;
         state.profileFetched = false;
       })
       .addCase(fetchCurrUser.fulfilled, (state, action) => {
-        state.isLoading = false;
+        // state.isLoading = false;
         state.profileFetched = true;
         state.user = action.payload.userProfile;
       })
       .addCase(fetchCurrUser.rejected, (state, action) => {
-        state.isLoading = false;
+        // state.isLoading = false;
         state.isError = true;
         state.user = null;
         state.status = "failed";
