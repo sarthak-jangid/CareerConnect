@@ -1,4 +1,5 @@
-require("dotenv").config();
+import dotenv from "dotenv";
+dotenv.config();
 
 import Profile from "../models/profile.model.js";
 import User from "../models/user.model.js";
@@ -125,10 +126,10 @@ export const register = async (req, res) => {
 
     // Set token as httpOnly cookie
     res.cookie("token", token, {
-      httpOnly: true, // JS cannot access
-      secure: process.env.NODE_ENV === "production", // HTTPS only in production
-      sameSite: "strict", // CSRF protection
-      maxAge: 7 * 24 * 60 * 60 * 1000, // Optional: 7 days
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // only secure on HTTPS
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     // Return success
