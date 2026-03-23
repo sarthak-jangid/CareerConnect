@@ -25,6 +25,7 @@ function DashboardLayout({ children }) {
     // 1. user is null
     // 2. current user fetch is complete (profileFetched)
     if (!user && profileFetched) {
+      console.log("this is here happen in the dashboard 1st useeffect");
       router.replace("/login");
     }
   }, [user, profileFetched, router]);

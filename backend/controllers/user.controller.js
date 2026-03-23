@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 import Profile from "../models/profile.model.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
@@ -144,6 +146,7 @@ export const register = async (req, res) => {
 // @returns {Object} - { message: "Logged in successfully" } with token cookie
 export const login = async (req, res) => {
   try {
+    console.lof("request come here .....");
     const { email, password } = req.body;
     if (!email || !password) {
       return res.status(400).json({ message: "All fields are required" });
@@ -169,8 +172,8 @@ export const login = async (req, res) => {
     // Set token as httpOnly cookie (already "auth_token")
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production", // only secure on HTTPS
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -191,8 +194,8 @@ export const logout = async (req, res) => {
     // Clear cookie
     res.clearCookie("token", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
+      secure: true,
+      sameSite: "none",
     });
 
     return res.status(200).json({ message: "Logged out successfully" });

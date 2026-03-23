@@ -22,11 +22,14 @@ export const loginUser = createAsyncThunk(
   "auth/loginUser",
   async (userData, ThunkAPI) => {
     try {
+      console.log("request go to the backend");
       const response = await clientServer.post("/login", {
         email: userData.email,
         password: userData.password,
       });
-      return response.data;
+      console.log("request come to the backend");
+
+      return ThunkAPI.fulfillWithValue(response.data);
     } catch (error) {
       const message =
         error.response?.data?.message || error.message || "Login failed";
