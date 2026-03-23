@@ -15,12 +15,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "https://career-connect-lovat.vercel.app/",
-      "https://career-connect-git-main-sarthak-jangids-projects.vercel.app/",
-      "https://career-connect-2cl17wkuk-sarthak-jangids-projects.vercel.app/",
-      "https://careerconnect.onrender.com",
-      "https://careerconnect-backend.onrender.com",
-      "https://career-connect.onrender.com",
+      "career-connect-lovat.vercel.app"
     ],
     credentials: true,
   }),
