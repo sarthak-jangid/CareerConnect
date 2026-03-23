@@ -5,7 +5,11 @@ import { useSelector, useDispatch } from "react-redux";
 import styles from "./styles.module.css";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { registerUser, loginUser } from "@/redux/actions/authActions";
+import {
+  registerUser,
+  loginUser,
+  fetchCurrUser, // ✅ added
+} from "@/redux/actions/authActions";
 import { Slide } from "react-toastify";
 
 function Login() {
@@ -28,20 +32,32 @@ function Login() {
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
 
+  // ✅ FETCH USER ON LOAD
+  useEffect(() => {
+    if (!auth.profileFetched) {
+      dispatch(fetchCurrUser());
+    }
+  }, [dispatch, auth.profileFetched]);
+
+  // ✅ REDIRECT IF LOGGED IN
+  useEffect(() => {
+    if (auth.profileFetched && auth.isLoggedIn) {
+      router.replace("/dashboard");
+    }
+  }, [auth.profileFetched, auth.isLoggedIn, router]);
+
   // Clear validation errors and reset irrelevant fields when switching mode
   useEffect(() => {
     setErrors({});
     setSubmitting(false);
     if (mode === "login") {
-      // remove register-only values when switching to login
       setForm((s) => ({ ...s, name: "", username: "", confirm: "" }));
     } else {
-      // when switching to register, ensure no leftover login-only flags remain
       setForm((s) => ({ ...s, remember: false }));
     }
   }, [mode]);
 
-  // Show server-side/auth errors as toast (only for the last action started here)
+  // Show server-side/auth errors as toast
   useEffect(() => {
     if (auth.isError && lastActionRef.current) {
       const msg =
@@ -60,10 +76,12 @@ function Login() {
     if (!form.password || form.password.length < 6)
       e.password = "Password must be 6+ characters";
     if (mode === "register") {
-      if (!form.name || form.name.trim().length < 2) e.name = "Enter your name";
+      if (!form.name || form.name.trim().length < 2)
+        e.name = "Enter your name";
       if (!form.username || form.username.trim().length < 3)
         e.username = "Choose a username (3+ characters)";
-      if (form.confirm !== form.password) e.confirm = "Passwords do not match";
+      if (form.confirm !== form.password)
+        e.confirm = "Passwords do not match";
     }
     return e;
   }
@@ -72,11 +90,13 @@ function Login() {
     ev.preventDefault();
     const e = validate();
     setErrors(e);
+
     if (Object.keys(e).length) {
       const first = Object.values(e)[0];
       if (first) toast.error(first);
       return;
     }
+
     setSubmitting(true);
     lastActionRef.current = mode;
 
@@ -118,33 +138,11 @@ function Login() {
     setForm((s) => ({ ...s, [name]: type === "checkbox" ? checked : value }));
   }
 
-  // If user is already logged in, show logged in message with link to dashboard
-  if (auth.isLoggedIn) {
+  // ✅ WAIT UNTIL AUTH CHECK FINISHES
+  if (!auth.profileFetched) {
     return (
       <UserLayout>
-        <div className={styles.pageBackground}>
-          <div className={styles.cardContainer}>
-            <div className={styles.cardContainer_left}>
-              <div className={styles.formWrap}>
-                <h2>You are already logged in</h2>
-                <p>Welcome back! You can go to your dashboard.</p>
-                <button
-                  className={styles.submit}
-                  onClick={() => router.replace("/dashboard")}
-                >
-                  Go to Dashboard
-                </button>
-              </div>
-            </div>
-            <div className={styles.cardContainer_right}>
-              <div className={styles.brand}>
-                <h1>CareerConnect</h1>
-                <p>Connect with opportunities. Build your career.</p>
-              </div>
-              <div className={styles.illustration} aria-hidden="true" />
-            </div>
-          </div>
-        </div>
+        <div className={styles.pageBackground}></div>
       </UserLayout>
     );
   }
@@ -162,7 +160,7 @@ function Login() {
           pauseOnFocusLoss
           draggable
           pauseOnHover
-          transition={Slide} // <- this ensures proper slide animation
+          transition={Slide}
           toastClassName="cc-toast"
           bodyClassName="cc-toast-body"
         />
@@ -305,7 +303,7 @@ function Login() {
             </div>
           </div>
 
-          {/* Right side = Branding / Switch link */}
+          {/* Right side */}
           <div className={styles.cardContainer_right}>
             <div className={styles.brand}>
               <h1>CareerConnect</h1>

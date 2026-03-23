@@ -16,7 +16,6 @@ export default function ViewProfilePage({ userProfile }) {
   const router = useRouter();
   const dispatch = useDispatch();
 
-  const postReducer = useSelector((state) => state.postReducer);
   const authState = useSelector((state) => state.auth);
   const postState = useSelector((state) => state.post);
 
@@ -25,7 +24,6 @@ export default function ViewProfilePage({ userProfile }) {
     useState(false);
   const [isConnectionNull, setIsConnectionNull] = useState(true);
 
-  // ✅ BIO LIMIT STATE
   const [showFullBio, setShowFullBio] = useState(false);
   const BIO_LIMIT = 120;
 
@@ -38,14 +36,22 @@ export default function ViewProfilePage({ userProfile }) {
     await dispatch(getAllPosts());
   };
 
- useEffect(() => {
+  // ✅ SORT POSTS (LATEST FIRST)
+  useEffect(() => {
     if (authState.user && postState.postFetched) {
-      const posts = (postState.posts || []).filter(
-        (post) => post?.userId?.username === userProfile.userId.username,
-      );
+      const posts = (postState.posts || [])
+        .filter(
+          (post) =>
+            post?.userId?.username === userProfile.userId.username
+        )
+        .sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+
       setUserPosts(posts);
     }
-  }, [authState.user, postState]);
+  }, [authState.user, postState, userProfile]);
+
   useEffect(() => {
     if (!userProfile?.userId?._id) return;
 
@@ -82,7 +88,7 @@ export default function ViewProfilePage({ userProfile }) {
     <UserLayout>
       <DashboardLayout>
         <div className={styles.container}>
-          {/* BACKDROP */}
+          {/* PROFILE IMAGE */}
           <div className={styles.backDropContainer}>
             <div className={styles.profileImageWrapper}>
               <img
@@ -92,7 +98,6 @@ export default function ViewProfilePage({ userProfile }) {
             </div>
           </div>
 
-          {/* PROFILE */}
           <div className={styles.profileContainer}>
             {/* LEFT */}
             <div className={styles.leftSection}>
@@ -116,7 +121,9 @@ export default function ViewProfilePage({ userProfile }) {
                         disabled={authState.connectionLoading}
                         onClick={async () => {
                           await dispatch(
-                            sendConnectionRequest(userProfile.userId._id)
+                            sendConnectionRequest(
+                              userProfile.userId._id
+                            )
                           );
                           await dispatch(getConnectionsRequest());
                         }}
@@ -129,7 +136,7 @@ export default function ViewProfilePage({ userProfile }) {
                   </div>
                 )}
 
-                {/*  BIO WITH LIMIT */}
+                {/* BIO */}
                 <p className={styles.bio}>
                   {showFullBio
                     ? userProfile?.bio
@@ -147,46 +154,55 @@ export default function ViewProfilePage({ userProfile }) {
               </div>
             </div>
 
-            {/* RIGHT */}
-              <div className={styles.sidebar}>
-                <h3>Recent Activity</h3>
+            {/* RIGHT - ✅ FIXED ACTIVITY */}
+            <div className={styles.sidebar}>
+              <h3>Recent Activity</h3>
 
-                {/* {console.log(authState.posts)} */}
+              {userPosts.length > 0 ? (
+                <div className={styles.activityCard}>
+                  {console.log("Latest Post:", userPosts[0])}
 
-                {userPosts.length > 0 ? (
-                  <div className={styles.activityCard}>
-                    {userPosts[0].media && (
-                      <img
-                        src={`${BASE_URL}/${userPosts[0].media}`}
-                        className={styles.activityImage}
-                      />
-                    )}
-                    <div>
-                      <p>{userPosts[0].body}</p>
-                      <span className={styles.tag}>Latest</span>
-                    </div>
-                  </div>
-                ) : (
-                  <div className={styles.noActivity}>No activity</div>
-                )}
-              </div>
+                  {userPosts[0]?.media &&
+                  userPosts[0]?.media !== "text_post" ? (
+                    // ✅ IMAGE POST
+                    <img
+                      src={`${BASE_URL}/${userPosts[0].media}`}
+                      className={styles.activityImage}
+                      alt="post"
+                      onError={(e) =>
+                        (e.target.style.display = "none")
+                      }
+                    />
+                  ) : (
+                    // ✅ TEXT POST
+                    <p>{userPosts[0]?.body}</p>
+                  )}
+
+                  <span className={styles.tag}>Latest</span>
+                </div>
+              ) : (
+                <div className={styles.noActivity}>
+                  No activity
+                </div>
+              )}
             </div>
+          </div>
 
           {/* WORK */}
           <div className={styles.workSection}>
             <h3>Work History</h3>
 
-             <div className={styles.workGrid}>
-                {(userProfile?.pastWork || []).map((w, i) => (
-                  <div key={i} className={styles.workCard}>
-                    <div className={styles.workTop}>
-                      <h5>{w.position}</h5>
-                      <span>{w.year}</span>
-                    </div>
-                    <p className={styles.company}>{w.company}</p>
+            <div className={styles.workGrid}>
+              {(userProfile?.pastWork || []).map((w, i) => (
+                <div key={i} className={styles.workCard}>
+                  <div className={styles.workTop}>
+                    <h5>{w.position}</h5>
+                    <span>{w.year}</span>
                   </div>
-                ))}
-              </div>
+                  <p className={styles.company}>{w.company}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </DashboardLayout>

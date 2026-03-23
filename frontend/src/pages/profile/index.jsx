@@ -57,6 +57,7 @@ export default function ProfilePage() {
       const posts = (postState.posts || []).filter(
         (post) => post?.userId?.username === authState.user.userId.username,
       );
+      console.log(posts);
       setUserPosts(posts);
     }
   }, [authState.user, postState]);
@@ -302,7 +303,7 @@ export default function ProfilePage() {
 
                 {userPosts.length > 0 ? (
                   <div className={styles.activityCard}>
-                    {userPosts[0].media && (
+                    {userPosts[0]?.media && userPosts[0].media !== "text_post" && (
                       <img
                         src={`${BASE_URL}/${userPosts[0].media}`}
                         className={styles.activityImage}

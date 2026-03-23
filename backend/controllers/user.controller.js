@@ -213,7 +213,7 @@ export const logout = async (req, res) => {
 export const uploadProfilePicture = async (req, res) => {
   const token = getTokenFromRequest(req);
 
-  // ✅ AUTHENTICATION CHECK: Verify user is logged in
+  //  AUTHENTICATION CHECK: Verify user is logged in
   try {
     const user = await User.findOne({ token: token });
     if (!user) {
@@ -246,7 +246,7 @@ export const updateUserProfile = async (req, res) => {
     const token = getTokenFromRequest(req);
     const { ...newUserData } = req.body; // body contains profile fields only
 
-    // ✅ AUTHENTICATION CHECK: Verify user is logged in
+    //  AUTHENTICATION CHECK: Verify user is logged in
     const user = await User.findOne({ token: token });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -288,7 +288,9 @@ export const getUserAndProfile = async (req, res) => {
     console.log("ok backend");
     const token = getTokenFromRequest(req);
 
-    // ✅ AUTHENTICATION CHECK: Verify user is logged in
+    if (!token) return res.status(400).json({ message: "Already logged out" });
+
+    //  AUTHENTICATION CHECK: Verify user is logged in
     const user = await User.findOne({ token: token });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -321,7 +323,7 @@ export const updateProfileData = async (req, res) => {
     const token = getTokenFromRequest(req);
     const { ...newProfileData } = req.body;
 
-    // ✅ AUTHENTICATION CHECK: Verify user is logged in
+    //  AUTHENTICATION CHECK: Verify user is logged in
     const user = await User.findOne({ token: token });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -398,7 +400,7 @@ export const sendConnectionRequest = async (req, res) => {
     const user = await User.findOne({ token });
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    // ✅ FIX: Prevent users from sending connection requests to themselves
+    //  FIX: Prevent users from sending connection requests to themselves
     if (user._id.toString() === connectionId) {
       return res
         .status(400)

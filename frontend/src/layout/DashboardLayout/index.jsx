@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import styles from "./index.module.css";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchCurrUser } from "@/redux/actions/authActions";
+import { fetchCurrUser, getAllUsers } from "@/redux/actions/authActions";
 import { BASE_URL } from "@/config/api";
 
 function DashboardLayout({ children }) {
@@ -15,6 +15,10 @@ function DashboardLayout({ children }) {
 
   const { user, isLoading, allProfilesFetched, allUsers, profileFetched } =
     useSelector((state) => state.auth);
+
+  useEffect(() => {
+    dispatch(getAllUsers());
+  }, []);
 
   useEffect(() => {
     // Only redirect if:
@@ -46,16 +50,6 @@ function DashboardLayout({ children }) {
   return (
     <div className="container">
       <div className={styles.homeContainer}>
-        {/* Mobile Hamburger */}
-        {windowWidth < 808 && (
-          <button
-            className={styles.hamburgerBtn}
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-          >
-            ☰
-          </button>
-        )}
-
         {/* Left Sidebar */}
         <div
           className={`${styles.homeContainer_leftBar} ${

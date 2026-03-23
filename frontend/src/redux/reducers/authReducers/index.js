@@ -32,13 +32,14 @@ const authSlice = createSlice({
     reset: () => initialState,
   },
   extraReducers: (builder) => {
-    // login ...
+    // ✅ LOGIN
     builder
       .addCase(loginUser.pending, (state) => {
         state.isLoading = true;
         state.message = "Logging in...";
         state.isError = false;
         state.status = "pending";
+        state.isLoggedIn = false;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
@@ -57,57 +58,53 @@ const authSlice = createSlice({
         state.isLoggedIn = false;
       });
 
-    // register ...
+    // ✅ REGISTER
     builder
       .addCase(registerUser.pending, (state) => {
         state.isLoading = true;
-        state.message = "Registering for you...";
+        state.message = "Registering...";
         state.status = "pending";
-        state.isSuccess = false;
-        state.isError = false;
+        state.isLoggedIn = false;
       })
       .addCase(registerUser.fulfilled, (state) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.message = "Registration is successful, Please Login";
-        state.status = "succeeded";
+        state.message = "Registration successful";
+        state.isLoggedIn = true;
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
-        state.status = "failed";
         state.message = action.payload;
-        state.isSuccess = false;
+        state.isLoggedIn = false;
       });
 
-    // fetch current user ...
+    //  FETCH CURRENT USER (🔥 MAIN FIX HERE)
     builder
       .addCase(fetchCurrUser.pending, (state) => {
-        // state.isLoading = true;
         state.profileFetched = false;
       })
       .addCase(fetchCurrUser.fulfilled, (state, action) => {
-        // state.isLoading = false;
         state.profileFetched = true;
-        state.user = action.payload.userProfile;
+        state.user = action.payload?.userProfile || null;
+
+        state.isLoggedIn = !!action.payload?.userProfile;
       })
       .addCase(fetchCurrUser.rejected, (state, action) => {
-        // state.isLoading = false;
         state.isError = true;
         state.user = null;
-        state.status = "failed";
-        state.message = action.payload;
+        state.isLoggedIn = false;
         state.profileFetched = true;
+        state.message = action.payload;
       });
 
-    // get all users ...
+    // ✅ GET ALL USERS
     builder
       .addCase(getAllUsers.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(getAllUsers.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.isError = false;
         state.allUsers = action.payload.profiles;
         state.allProfilesFetched = true;
       })
@@ -117,78 +114,44 @@ const authSlice = createSlice({
         state.message = action.payload;
       });
 
-    // send connection request ...
+    // ✅ CONNECTION REQUEST
     builder
       .addCase(sendConnectionRequest.pending, (state) => {
         state.connectionLoading = true;
-        state.message = "Sending connection request...";
-        state.isError = false;
-        state.isSuccess = false;
       })
       .addCase(sendConnectionRequest.fulfilled, (state) => {
         state.connectionLoading = false;
-        state.isSuccess = true;
-        state.message = "Connection request sent successfully!";
-        state.isError = false;
       })
-      .addCase(sendConnectionRequest.rejected, (state, action) => {
+      .addCase(sendConnectionRequest.rejected, (state) => {
         state.connectionLoading = false;
-        // Don't set error for "already sent" - treat as success for UI
-        if (action.payload !== "Connection request already sent") {
-          state.isError = true;
-        }
-        state.message = action.payload || "Failed to send connection request";
-        state.isSuccess = false;
       });
 
-    // get connection requests ...
+    // ✅ CONNECTIONS
     builder
       .addCase(getConnectionsRequest.fulfilled, (state, action) => {
         state.connections = action.payload.connections;
-        state.isError = false;
-        state.isSuccess = true;
       })
-      .addCase(getConnectionsRequest.rejected, (state, action) => {
-        state.isLoading = false;
-        state.isError = true;
-        state.isSuccess = false;
-        state.message = action.payload || "Failed to get connections";
-      });
-
-    // get my connection requests ...
-    builder
       .addCase(getMyConnectionRequests.fulfilled, (state, action) => {
         state.connectionRequest = action.payload.connections;
-        state.isError = false;
-        state.isSuccess = true;
-      })
-      .addCase(getMyConnectionRequests.rejected, (state, action) => {
-        state.isLoading = false;
-        state.isError = true;
-        state.isSuccess = false;
-        state.message = action.payload || "Failed to get my connections";
-      })
-
-      // logout
-      .addCase(logoutUser.pending, (state) => {
-        state.isLoading = true;
-        state.message = "Logging out...";
-        state.isError = false;
-        state.isSuccess = false;
-      })
-      .addCase(logoutUser.fulfilled, (state, action) => {
-        // Reset everything using the reset reducer logic
-        return {
-          ...initialState,
-          message: action.payload?.message || "Logged out successfully",
-        };
-      })
-      .addCase(logoutUser.rejected, (state, action) => {
-        state.isLoading = false;
-        state.isError = true;
-        state.isSuccess = false;
-        state.message = action.payload?.message || "Logout failed";
       });
+
+    // ✅ LOGOUT (🔥 STRONG FIX)
+    builder.addCase(logoutUser.fulfilled, () => {
+      return {
+        user: null,
+        isLoggedIn: false,
+        isLoading: false,
+        isError: false,
+        isSuccess: false,
+        message: "",
+        status: "idle",
+        connections: [],
+        connectionRequest: [],
+        profileFetched: true, // 🔥 prevents flicker
+        allUsers: null,
+        allProfilesFetched: false,
+      };
+    });
   },
 });
 
