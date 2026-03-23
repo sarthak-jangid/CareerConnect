@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const BASE_URL = "https://careerconnect-8ip9.onrender.com";
+export const BASE_URL = process.env.NEXT_PUBLIC_BASEURL;
 
 const clientServer = axios.create({
   baseURL: BASE_URL,
