@@ -43,7 +43,7 @@ function DashboardLayout({ children }) {
     }
   }, [dispatch, router, user]);
 
-  if (isLoading || user === true) {
+  if (isLoading && !profileFetched) {
     return <div className={styles.loader}>Loading...</div>;
   }
 

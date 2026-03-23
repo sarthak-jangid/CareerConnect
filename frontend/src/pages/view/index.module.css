@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 .container {
   padding: 1.5rem;
   overflow-x: hidden;
@@ -39,6 +43,7 @@
 
 .leftSection {
   flex: 1;
+  min-width: 0;
 }
 
 /* NAME */
@@ -142,7 +147,8 @@
 }
 
 .workCard {
-  width: 260px;
+  width: 100%;
+  min-width: 260px;
   padding: 1rem;
   border-radius: 14px;
   background: linear-gradient(180deg, #ffffff, #fafafa);
@@ -200,6 +206,25 @@
 }
 
 /* MOBILE */
+@media (min-width: 808px) and (max-width: 1070px) {
+  .sidebar {
+    width: 220px;
+  }
+
+  .workCard {
+    width: 240px;
+    flex-basis: calc(50% - 0.5rem);
+  }
+
+  .profileContainer {
+    gap: 1.5rem;
+  }
+
+  .workGrid {
+    gap: 0.75rem;
+  }
+}
+
 @media (max-width: 808px) {
   .profileContainer {
     flex-direction: column;
@@ -218,5 +243,35 @@
 
   .workCard {
     width: 100%;
+  }
+}
+
+/* =========================
+   TABLET (808px → 1070px)
+   ========================= */
+@media (min-width: 808px) and (max-width: 1070px) {
+  .profileContainer {
+    gap: 1.2rem;
+  }
+
+  .sidebar {
+    width: 200px; /* reduced */
+    flex-shrink: 0;
+  }
+
+  .bio {
+    max-width: 100%;
+  }
+
+  /* 🔥 FIX GRID PROPERLY */
+  .workGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .workCard {
+    flex: 1 1 calc(50% - 1rem);
+    max-width: calc(50% - 1rem);
   }
 }

@@ -1,17 +1,46 @@
+/* Navbar */
 .navbar {
-  padding: 1.2rem;  
+  padding: 1rem 1.5rem;
   background-color: #f8f9fa;
   border-bottom: 1px solid #eee;
+  position: relative;
+  z-index: 999;
 }
 
+/* Container */
 .navbarContainer {
   display: flex;
-  font-size: 0.8rem;
   align-items: center;
   justify-content: space-between;
-  font-weight: bold;
-  color: #333;
+  position: relative;
 }
+
+/* Logo */
+.navbarContainer h1 {
+  cursor: pointer;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+/* ================= DESKTOP ================= */
+
+.desktopMenu {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.greetingDesktop {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.greetingDesktop span {
+  font-weight: 600;
+  color: #111827;
+}
+
+/* ================= BUTTONS ================= */
 
 .button {
   padding: 0.5rem 1rem;
@@ -20,80 +49,93 @@
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
-  font-size: 0.7rem;
-  font-weight: bold ;
+  font-size: 0.8rem;
+  font-weight: bold;
 }
+
 .button:hover {
   background-color: rgb(220, 50, 50);
 }
 
-
-/* ..................................................................... */
-
-.userBox {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-/* Greeting text */
-.greeting {
-  font-size: 0.85rem;
-  color: #6b7280;
-}
-
-.greeting span {
-  font-weight: 600;
-  color: #111827;
-}
-
-/* Profile button */
 .profileBtn {
   padding: 6px 14px;
-  font-size: 13px;
   border-radius: 20px;
-  border: 1px solid #e0e0e0;
   background: #383737;
-  cursor: pointer;
   color: white;
-  transition: all 0.2s ease;
-}
-
-.profileBtn:hover {
-  background: #464040;
-  font-size: 13.4px;
-}
-
-/* Be a part button */
-.joinBtn {
-  padding: 8px 18px;
-  font-size: 14px;
-  border-radius: 20px;
   border: none;
-  background: #387ed1; /* Zerodha blue */
-  color: white;
   cursor: pointer;
-  transition: background 0.2s ease;
 }
 
-.joinBtn:hover {
-  background: #2c6cbf;
-}
-
-/* Logout button */
 .logoutBtn {
   padding: 6px 14px;
-  font-size: 13px;
   border-radius: 20px;
-  border: none;
   background: #ef4444;
-  cursor: pointer;
   color: white;
-  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
 }
 
-.logoutBtn:hover {
-  background: #dc2626;
-  font-size: 13.4px;
+/* ================= HAMBURGER ================= */
+
+.hamburger {
+  display: none;
+  font-size: 1.6rem;
+  cursor: pointer;
+}
+
+/* ================= MOBILE ================= */
+
+.mobileMenu {
+  display: none;
+}
+
+/* MOBILE VIEW */
+@media (max-width: 768px) {
+
+  .desktopMenu {
+    display: none; /* ❌ hide desktop content */
+  }
+
+  .hamburger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .mobileMenu {
+    position: absolute;
+    top: 65px;
+    right: 20px;
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    min-width: 200px;
+    z-index: 1000;
+  }
+
+  .mobileMenu.active {
+    display: flex;
+  }
+
+  .greeting {
+    text-align: center;
+    width: 100%;
+    word-break: break-word;
+    font-size: 0.9rem;
+    color: #6b7280;
+  }
+
+  .greeting span {
+    font-weight: 600;
+    color: #111827;
+  }
+
+  .mobileMenu button {
+    width: 100%;
+  }
 }

@@ -304,7 +304,26 @@
 }
 
 /* ================= MOBILE ================= */
-@media (max-width: 768px) {
+@media (min-width: 808px) and (max-width: 1070px) {
+  .sidebar {
+    width: 220px;
+  }
+
+  .workCard {
+    width: 240px;
+    flex-basis: calc(50% - 0.5rem);
+  }
+
+  .profileContainer {
+    gap: 1.5rem;
+  }
+
+  .workGrid {
+    gap: 0.75rem;
+  }
+}
+
+@media (max-width: 808px) {
   .profileContainer {
     flex-direction: column;
     margin-top: 80px;
@@ -323,6 +342,10 @@
     left: 50%;
     transform: translateX(-50%);
     bottom: -50px;
+  }
+
+  .workCard {
+    width: 100%;
   }
 }
 
