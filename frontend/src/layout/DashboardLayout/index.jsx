@@ -20,29 +20,25 @@ function DashboardLayout({ children }) {
     dispatch(getAllUsers());
   }, []);
 
+  // Fetch current user once and handle redirect if not logged in
   useEffect(() => {
-    // Only redirect if:
-    // 1. user is null
-    // 2. current user fetch is complete (profileFetched)
-    if (!user && profileFetched) {
-      console.log("this is here happen in the dashboard 1st useeffect");
-      router.replace("/login");
-    }
-  }, [user, profileFetched, router]);
+    const fetchUser = async () => {
+      if (!user) {
+        try {
+          await dispatch(fetchCurrUser()).unwrap();
+        } catch {
+          router.replace("/login");
+        }
+      }
+    };
+    fetchUser();
+  }, [dispatch, router, user]);
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-
-  useEffect(() => {
-    if (!user) {
-      dispatch(fetchCurrUser())
-        .unwrap()
-        .catch(() => router.replace("/login"));
-    }
-  }, [dispatch, router, user]);
 
   if (isLoading && !profileFetched) {
     return <div className={styles.loader}>Loading...</div>;
