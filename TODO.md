@@ -8,7 +8,12 @@
 - [x] Analyzed code (CORS issue confirmed)
 
 ## Steps To Complete
-1. **[PENDING]** Get exact Render URL, set NEXT_PUBLIC_BASEURL in frontend/.env.local
+1. **[HIGH PRIORITY]** Copy EXACT Render URL from dashboard → frontend/.env.local:
+```
+NEXT_PUBLIC_BASEURL=https://your-exact-app.onrender.com
+```
+`npm run dev` restart
+
 2. **[PENDING]** Deploy new backend cookie fix: git push
 2. **[DONE]** CORS fixed (server.js)
 3. **[PENDING]** Manual: Add to frontend/.env.local:

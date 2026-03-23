@@ -15,7 +15,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "career-connect-lovat.vercel.app"
+      "https://career-connect-lovat.vercel.app",
     ],
     credentials: true,
   }),

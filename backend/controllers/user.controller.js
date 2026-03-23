@@ -16,7 +16,11 @@ import ConnectionRequest from "../models/connections.model.js";
  * @returns {String|undefined} - Token string or undefined if not found
  */
 const getTokenFromRequest = (req) => {
-  console.log("get token work");
+  console.log("=== DEBUG COOKIES ===");
+  console.log("Cookies:", req.cookies);
+  console.log("Headers auth:", req.headers.authorization);
+  console.log("Token found:", req.cookies?.token);
+  console.log("===================");
   return (
     req.cookies?.token || // cookie name "token"
     (req.headers?.authorization?.startsWith("Bearer ")
@@ -25,6 +29,7 @@ const getTokenFromRequest = (req) => {
     req.body?.token
   );
 };
+
 
 /**
  * UTILITY: Convert user profile data to PDF document
