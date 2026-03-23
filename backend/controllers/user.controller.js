@@ -147,7 +147,7 @@ export const register = async (req, res) => {
 // @returns {Object} - { message: "Logged in successfully" } with token cookie
 export const login = async (req, res) => {
   try {
-    console.lof("request come here .....");
+    console.log("request come here .....");
     const { email, password } = req.body;
     if (!email || !password) {
       return res.status(400).json({ message: "All fields are required" });
