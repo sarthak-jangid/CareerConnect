@@ -11,10 +11,17 @@ import userRoutes from "./routes/user.routes.js";
 
 const app = express();
 
-app.use(cors({
-  origin: ["http://localhost:3000"],
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "https://career-connect-lovat.vercel.app/",
+      "https://career-connect-git-main-sarthak-jangids-projects.vercel.app/",
+      "https://career-connect-2cl17wkuk-sarthak-jangids-projects.vercel.app/",
+    ],
+    credentials: true,
+  }),
+);
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static("uploads"));
