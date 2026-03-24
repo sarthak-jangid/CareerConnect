@@ -3,14 +3,14 @@ import React, { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/router";
 import { useSelector, useDispatch } from "react-redux";
 import styles from "./styles.module.css";
-import { toast, ToastContainer } from "react-toastify";
+import { toast, ToastContainer, Slide } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
 import {
   registerUser,
   loginUser,
-  fetchCurrUser, // ✅ added
+  fetchCurrUser,
 } from "@/redux/actions/authActions";
-import { Slide } from "react-toastify";
 
 function Login() {
   const router = useRouter();
@@ -46,7 +46,7 @@ function Login() {
     }
   }, [auth.profileFetched, auth.isLoggedIn, router]);
 
-  // Clear validation errors and reset irrelevant fields when switching mode
+  // Reset form on mode change
   useEffect(() => {
     setErrors({});
     setSubmitting(false);
@@ -57,15 +57,10 @@ function Login() {
     }
   }, [mode]);
 
-  // Show server-side/auth errors as toast
+  // ✅ ONLY ERROR TOAST (no success here)
   useEffect(() => {
-    if (auth.isError && lastActionRef.current) {
-      const msg =
-        (auth.message && (auth.message.message || auth.message)) ||
-        "Something went wrong";
-      toast.error(msg);
-      lastActionRef.current = null;
-      setSubmitting(false);
+    if (auth.isError) {
+      toast.error(auth.message || "Something went wrong");
     }
   }, [auth.isError, auth.message]);
 
@@ -73,19 +68,25 @@ function Login() {
     const e = {};
     if (!form.email || !/\S+@\S+\.\S+/.test(form.email))
       e.email = "Enter a valid email";
+
     if (!form.password || form.password.length < 6)
       e.password = "Password must be 6+ characters";
+
     if (mode === "register") {
       if (!form.name || form.name.trim().length < 2)
         e.name = "Enter your name";
+
       if (!form.username || form.username.trim().length < 3)
-        e.username = "Choose a username (3+ characters)";
+        e.username = "Username must be at least 3 characters";
+
       if (form.confirm !== form.password)
         e.confirm = "Passwords do not match";
     }
+
     return e;
   }
 
+  // ✅ FIXED TOAST LOGIC ONLY HERE
   async function handleSubmit(ev) {
     ev.preventDefault();
     const e = validate();
@@ -105,10 +106,12 @@ function Login() {
         await dispatch(
           loginUser({ email: form.email, password: form.password })
         ).unwrap();
-        toast.success("Login successful");
-        setSubmitting(false);
+
+        toast.success("Login successful ✅");
+
         router.push("/dashboard");
       } else {
+        // Register
         await dispatch(
           registerUser({
             name: form.name,
@@ -117,17 +120,23 @@ function Login() {
             password: form.password,
           })
         ).unwrap();
-        toast.success("Account created");
 
-        lastActionRef.current = "login";
-        await dispatch(
-          loginUser({ email: form.email, password: form.password })
-        ).unwrap();
-        toast.success("Login successful");
-        setSubmitting(false);
-        router.push("/dashboard");
+        toast.success("Account created successfully 🎉");
+
+        // Delay login to avoid toast conflict
+        setTimeout(async () => {
+          try {
+            await dispatch(
+              loginUser({ email: form.email, password: form.password })
+            ).unwrap();
+
+            router.push("/dashboard");
+          } catch (err) {}
+        }, 500);
       }
     } catch (err) {
+      // error handled in useEffect
+    } finally {
       setSubmitting(false);
       lastActionRef.current = null;
     }
@@ -135,10 +144,12 @@ function Login() {
 
   function handleChange(e) {
     const { name, value, type, checked } = e.target;
-    setForm((s) => ({ ...s, [name]: type === "checkbox" ? checked : value }));
+    setForm((s) => ({
+      ...s,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   }
 
-  // ✅ WAIT UNTIL AUTH CHECK FINISHES
   if (!auth.profileFetched) {
     return (
       <UserLayout>
@@ -154,29 +165,28 @@ function Login() {
           position="top-right"
           autoClose={2000}
           hideProgressBar={false}
-          newestOnTop={false}
           closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
           pauseOnHover
+          draggable
           transition={Slide}
-          toastClassName="cc-toast"
-          bodyClassName="cc-toast-body"
+          limit={1} // ✅ prevent duplicate
         />
+
         <div className={styles.cardContainer}>
-          {/* Form on the left */}
+          {/* LEFT */}
           <div className={styles.cardContainer_left}>
             <div className={styles.formWrap}>
               <h2>
-                {mode === "login" ? "Welcome back" : "Create your account"}
+                {mode === "login"
+                  ? "Welcome back"
+                  : "Create your account"}
               </h2>
 
-              <form className={styles.form} onSubmit={handleSubmit} noValidate>
-                {errors.form && (
-                  <div className={styles.formError}>{errors.form}</div>
-                )}
-
+              <form
+                className={styles.form}
+                onSubmit={handleSubmit}
+                noValidate
+              >
                 {mode === "register" && (
                   <label className={styles.field}>
                     <span className={styles.labelText}>Full name</span>
@@ -204,7 +214,9 @@ function Login() {
                       placeholder="your-username"
                     />
                     {errors.username && (
-                      <small className={styles.error}>{errors.username}</small>
+                      <small className={styles.error}>
+                        {errors.username}
+                      </small>
                     )}
                   </label>
                 )}
@@ -244,13 +256,17 @@ function Login() {
                     </button>
                   </div>
                   {errors.password && (
-                    <small className={styles.error}>{errors.password}</small>
+                    <small className={styles.error}>
+                      {errors.password}
+                    </small>
                   )}
                 </label>
 
                 {mode === "register" && (
                   <label className={styles.field}>
-                    <span className={styles.labelText}>Confirm password</span>
+                    <span className={styles.labelText}>
+                      Confirm password
+                    </span>
                     <input
                       name="confirm"
                       type={showPassword ? "text" : "password"}
@@ -260,32 +276,11 @@ function Login() {
                       placeholder="Retype password"
                     />
                     {errors.confirm && (
-                      <small className={styles.error}>{errors.confirm}</small>
+                      <small className={styles.error}>
+                        {errors.confirm}
+                      </small>
                     )}
                   </label>
-                )}
-
-                {mode === "login" && (
-                  <div className={styles.row}>
-                    <label className={styles.checkboxLabel}>
-                      <input
-                        name="remember"
-                        type="checkbox"
-                        checked={form.remember}
-                        onChange={handleChange}
-                      />
-                      Remember me
-                    </label>
-                    <a
-                      className={styles.link}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        router.push("/forget-password");
-                      }}
-                    >
-                      Forgot Password?
-                    </a>
-                  </div>
                 )}
 
                 <button
@@ -303,11 +298,12 @@ function Login() {
             </div>
           </div>
 
-          {/* Right side */}
+          {/* RIGHT */}
           <div className={styles.cardContainer_right}>
             <div className={styles.brand}>
               <h1>CareerConnect</h1>
               <p>Connect with opportunities. Build your career.</p>
+
               <p className={styles.switchModeText}>
                 {mode === "login" ? (
                   <>
@@ -332,7 +328,6 @@ function Login() {
                 )}
               </p>
             </div>
-            <div className={styles.illustration} aria-hidden="true" />
           </div>
         </div>
       </div>
