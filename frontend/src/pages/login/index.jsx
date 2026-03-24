@@ -32,21 +32,21 @@ function Login() {
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
 
-  // ✅ FETCH USER ON LOAD
+  // FETCH USER
   useEffect(() => {
     if (!auth.profileFetched) {
       dispatch(fetchCurrUser());
     }
   }, [dispatch, auth.profileFetched]);
 
-  // ✅ REDIRECT IF LOGGED IN
+  // REDIRECT IF LOGGED IN
   useEffect(() => {
     if (auth.profileFetched && auth.isLoggedIn) {
       router.replace("/dashboard");
     }
   }, [auth.profileFetched, auth.isLoggedIn, router]);
 
-  // Reset form on mode change
+  // RESET FORM ON MODE CHANGE
   useEffect(() => {
     setErrors({});
     setSubmitting(false);
@@ -57,7 +57,7 @@ function Login() {
     }
   }, [mode]);
 
-  // ✅ ONLY ERROR TOAST (no success here)
+  // ONLY ERROR TOAST
   useEffect(() => {
     if (auth.isError) {
       toast.error(auth.message || "Something went wrong");
@@ -73,20 +73,18 @@ function Login() {
       e.password = "Password must be 6+ characters";
 
     if (mode === "register") {
-      if (!form.name || form.name.trim().length < 2)
-        e.name = "Enter your name";
+      if (!form.name || form.name.trim().length < 2) e.name = "Enter your name";
 
       if (!form.username || form.username.trim().length < 3)
         e.username = "Username must be at least 3 characters";
 
-      if (form.confirm !== form.password)
-        e.confirm = "Passwords do not match";
+      if (form.confirm !== form.password) e.confirm = "Passwords do not match";
     }
 
     return e;
   }
 
-  // ✅ FIXED TOAST LOGIC ONLY HERE
+  // FIXED TOAST LOGIC
   async function handleSubmit(ev) {
     ev.preventDefault();
     const e = validate();
@@ -104,21 +102,19 @@ function Login() {
     try {
       if (mode === "login") {
         await dispatch(
-          loginUser({ email: form.email, password: form.password })
+          loginUser({ email: form.email, password: form.password }),
         ).unwrap();
 
         toast.success("Login successful ✅");
-
         router.push("/dashboard");
       } else {
-        // Register
         await dispatch(
           registerUser({
             name: form.name,
             username: form.username,
             email: form.email,
             password: form.password,
-          })
+          }),
         ).unwrap();
 
         toast.success("Account created successfully 🎉");
@@ -127,15 +123,15 @@ function Login() {
         setTimeout(async () => {
           try {
             await dispatch(
-              loginUser({ email: form.email, password: form.password })
+              loginUser({ email: form.email, password: form.password }),
             ).unwrap();
 
             router.push("/dashboard");
-          } catch (err) {}
+          } catch {}
         }, 500);
       }
     } catch (err) {
-      // error handled in useEffect
+      // handled in useEffect
     } finally {
       setSubmitting(false);
       lastActionRef.current = null;
@@ -169,7 +165,7 @@ function Login() {
           pauseOnHover
           draggable
           transition={Slide}
-          limit={1} // ✅ prevent duplicate
+          limit={1}
         />
 
         <div className={styles.cardContainer}>
@@ -177,16 +173,10 @@ function Login() {
           <div className={styles.cardContainer_left}>
             <div className={styles.formWrap}>
               <h2>
-                {mode === "login"
-                  ? "Welcome back"
-                  : "Create your account"}
+                {mode === "login" ? "Welcome back" : "Create your account"}
               </h2>
 
-              <form
-                className={styles.form}
-                onSubmit={handleSubmit}
-                noValidate
-              >
+              <form className={styles.form} onSubmit={handleSubmit} noValidate>
                 {mode === "register" && (
                   <label className={styles.field}>
                     <span className={styles.labelText}>Full name</span>
@@ -214,9 +204,7 @@ function Login() {
                       placeholder="your-username"
                     />
                     {errors.username && (
-                      <small className={styles.error}>
-                        {errors.username}
-                      </small>
+                      <small className={styles.error}>{errors.username}</small>
                     )}
                   </label>
                 )}
@@ -256,17 +244,13 @@ function Login() {
                     </button>
                   </div>
                   {errors.password && (
-                    <small className={styles.error}>
-                      {errors.password}
-                    </small>
+                    <small className={styles.error}>{errors.password}</small>
                   )}
                 </label>
 
                 {mode === "register" && (
                   <label className={styles.field}>
-                    <span className={styles.labelText}>
-                      Confirm password
-                    </span>
+                    <span className={styles.labelText}>Confirm password</span>
                     <input
                       name="confirm"
                       type={showPassword ? "text" : "password"}
@@ -276,11 +260,34 @@ function Login() {
                       placeholder="Retype password"
                     />
                     {errors.confirm && (
-                      <small className={styles.error}>
-                        {errors.confirm}
-                      </small>
+                      <small className={styles.error}>{errors.confirm}</small>
                     )}
                   </label>
+                )}
+
+                {/* ✅ RESTORED SECTION */}
+                {mode === "login" && (
+                  <div className={styles.row}>
+                    <label className={styles.checkboxLabel}>
+                      <input
+                        name="remember"
+                        type="checkbox"
+                        checked={form.remember}
+                        onChange={handleChange}
+                      />
+                      Remember me
+                    </label>
+
+                    <a
+                      className={styles.link}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        router.push("/forget-password");
+                      }}
+                    >
+                      Forgot Password?
+                    </a>
+                  </div>
                 )}
 
                 <button
@@ -291,8 +298,8 @@ function Login() {
                   {submitting
                     ? "Please wait…"
                     : mode === "login"
-                    ? "Sign in"
-                    : "Create account"}
+                      ? "Sign in"
+                      : "Create account"}
                 </button>
               </form>
             </div>
