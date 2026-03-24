@@ -83,12 +83,13 @@ const authSlice = createSlice({
     builder
       .addCase(fetchCurrUser.pending, (state) => {
         state.profileFetched = false;
+        state.isLoggedIn = false;
       })
       .addCase(fetchCurrUser.fulfilled, (state, action) => {
         state.profileFetched = true;
         state.user = action.payload?.userProfile || null;
 
-        state.isLoggedIn = !!action.payload?.userProfile;
+        state.isLoggedIn = true;
       })
       .addCase(fetchCurrUser.rejected, (state, action) => {
         state.isError = true;

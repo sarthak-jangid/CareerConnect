@@ -30,7 +30,6 @@ const getTokenFromRequest = (req) => {
   );
 };
 
-
 /**
  * UTILITY: Convert user profile data to PDF document
  * Generates a formatted PDF with user info, bio, and work history
@@ -176,10 +175,17 @@ export const login = async (req, res) => {
     await user.save();
 
     // Set token as httpOnly cookie (already "auth_token")
+    // res.cookie("token", token, {
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === "production", // only secure on HTTPS
+    //   sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+    //   maxAge: 7 * 24 * 60 * 60 * 1000,
+    // });
+
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // only secure on HTTPS
-      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      secure: true, // force true (since Render = HTTPS)
+      sameSite: "None", // required for cross-origin
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
