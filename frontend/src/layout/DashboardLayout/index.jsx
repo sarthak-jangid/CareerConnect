@@ -17,8 +17,10 @@ function DashboardLayout({ children }) {
     useSelector((state) => state.auth);
 
   useEffect(() => {
-    dispatch(getAllUsers());
-  }, []);
+    if (!allProfilesFetched) {
+      dispatch(getAllUsers());
+    }
+  }, [dispatch, allProfilesFetched]);
 
   // Fetch current user once and handle redirect if not logged in
   useEffect(() => {

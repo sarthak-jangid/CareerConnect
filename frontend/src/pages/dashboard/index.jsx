@@ -35,7 +35,7 @@ const Dashboard = () => {
     if (!authState.allProfilesFetched) {
       dispatch(getAllUsers());
     }
-  }, [dispatch]);
+  }, [dispatch, authState.allProfilesFetched]);
 
   const handleUpload = async () => {
     await dispatch(

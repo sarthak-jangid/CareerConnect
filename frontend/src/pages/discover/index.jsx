@@ -16,7 +16,7 @@ export default function DiscoverPage() {
     if (!authState.allProfilesFetched) {
       dispatch(getAllUsers());
     }
-  }, []);
+  }, [dispatch, authState.allProfilesFetched]);
 
   const filteredUsers = authState.allUsers
     ? authState.allUsers.filter(
