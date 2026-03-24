@@ -138,6 +138,10 @@
   width: 1.6rem;  
 }
 
+.singleNavItemHolder_mobileView {
+  cursor: pointer;
+}
+
 /* ================= LOADER ================= */
 .loader {
   display: flex;
