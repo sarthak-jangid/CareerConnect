@@ -266,7 +266,7 @@ function Login() {
                 )}
 
                 {/* ✅ RESTORED SECTION */}
-                {mode === "login" && (
+                {/* {mode === "login" && (
                   <div className={styles.row}>
                     <label className={styles.checkboxLabel}>
                       <input
@@ -288,7 +288,7 @@ function Login() {
                       Forgot Password?
                     </a>
                   </div>
-                )}
+                )} */}
 
                 <button
                   className={styles.submit}
