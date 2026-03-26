@@ -13,10 +13,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "https://career-connect-lovat.vercel.app",
-    ],
+    origin: ["http://localhost:3000", "https://careerconnect-app.vercel.app/"],
     credentials: true,
   }),
 );
